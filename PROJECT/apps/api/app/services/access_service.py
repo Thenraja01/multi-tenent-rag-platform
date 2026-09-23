@@ -94,11 +94,37 @@ class AccessService:
         is_tenant_admin = user.is_org_admin or "tenant_admin" in role_slugs
 
         # 5. Calculate Effective Permissions via Deterministic Precedence:
-        # Precedence: 1. Tenant Admin wildcard / 2. User ALLOW - User DENY / 3. Scoped Role Perms
+        # Precedence: 1. Org Admin Explicit Management Perms / 2. Scoped Role Perms / 3. User ALLOW - User DENY
         role_permissions: Set[str] = set()
+        
         if is_tenant_admin:
-            role_permissions.add("*")
-        elif role_ids:
+            # Grant explicit organizational governance permissions without bypass over unassigned sensitive business data
+            role_permissions.update([
+                "org.admin.access",
+                "org.admin.control_center",
+                "org.users.view",
+                "org.users.create",
+                "org.users.manage",
+                "org.roles.view",
+                "org.roles.manage",
+                "org.departments.view",
+                "org.departments.manage",
+                "org.domains.view",
+                "org.domains.manage",
+                "org.modules.view",
+                "org.modules.manage",
+                "org.settings.view",
+                "org.settings.manage",
+                "org.audit.view",
+                "documents.view",
+                "documents.upload",
+                "documents.approve",
+                "nexus.chat",
+                "knowledge.view",
+                "knowledge.query",
+            ])
+
+        if role_ids:
             rp_stmt = (
                 select(Permission.permission_key)
                 .join(RolePermission, RolePermission.permission_id == Permission.id)
@@ -112,7 +138,7 @@ class AccessService:
                 # and role is NOT tenant_admin, verify user belongs to that department
                 parts = p_lower.split(".")
                 domain_prefix = parts[0] if len(parts) > 1 else None
-                if not domain_prefix or domain_prefix in assigned_dept_slugs or "admin" in role_slugs:
+                if not domain_prefix or domain_prefix in assigned_dept_slugs or is_tenant_admin:
                     role_permissions.add(p_lower)
 
         # User UBAC Overrides
@@ -178,6 +204,8 @@ class AccessService:
                     "required_permission": f"{m.slug}:view",
                 })
 
+        primary_dept = next((d for d in departments if d.get("is_primary")), (departments[0] if departments else None))
+
         return {
             "user": {
                 "id": str(user.id),
@@ -195,6 +223,12 @@ class AccessService:
             "domains": domains,
             "modules": modules,
             "permissions": effective_permissions,
+            "scopes": {
+                "department_ids": [d["id"] for d in departments],
+                "department_slugs": [d["slug"] for d in departments],
+                "primary_department_slug": primary_dept["slug"] if primary_dept else None,
+                "is_org_wide": is_tenant_admin,
+            },
         }
 
     @staticmethod

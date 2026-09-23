@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/use-auth';
 import { apiClient } from '@/lib/api/client';
+import { resolveDashboardRoute } from '@/lib/navigation';
 import { AuthVisualShowcase } from '@/components/auth/AuthVisualShowcase';
 import {
   Bot,
@@ -160,17 +161,15 @@ function LoginForm() {
       let targetUrl = '/dashboard';
       if (redirectPath && redirectPath !== '/login' && redirectPath !== '/') {
         targetUrl = redirectPath;
-      } else if (isPlatformAdmin) {
-        targetUrl = '/superadmin';
-      } else if (isOrgAdmin) {
-        // Organization Admins always land in the Org Admin Control Center
-        targetUrl = '/dashboard';
-      } else if (detectedTenant) {
-        // Employees with an assigned department land directly in their department
-        targetUrl = deptSlug ? `/${deptSlug}` : '/workspace';
       } else {
-        // If on platform root domain, route to /[tenantSlug]/[deptSlug] or /[tenantSlug]/workspace
-        targetUrl = deptSlug ? `/${tenantSlug}/${deptSlug}` : `/${tenantSlug}/workspace`;
+        const authContext = {
+          is_superadmin: isPlatformAdmin,
+          is_org_admin: isOrgAdmin,
+          permissions: (res as { permissions?: string[] })?.permissions || (isOrgAdmin ? ['org.admin.control_center'] : []),
+          departments: (res?.user as { departments?: Array<{ slug: string; is_primary?: boolean }> })?.departments || (deptSlug ? [{ slug: deptSlug, is_primary: true }] : []),
+          tenant_slug: tenantSlug,
+        };
+        targetUrl = resolveDashboardRoute(authContext, detectedTenant);
       }
 
       window.location.href = targetUrl;

@@ -324,3 +324,63 @@ export function buildOrgAdminNav(
     },
   ];
 }
+
+export interface UserAuthContext {
+  is_superadmin?: boolean;
+  is_org_admin?: boolean;
+  permissions?: string[];
+  departments?: Array<{ slug: string; name?: string; is_primary?: boolean }>;
+  scopes?: {
+    department_slugs?: string[];
+    primary_department_slug?: string | null;
+    is_org_wide?: boolean;
+  };
+  tenant_slug?: string;
+  organization?: { slug?: string };
+}
+
+/**
+ * Hardened Capability-Driven Dashboard Route Resolver:
+ * Priority Evaluation:
+ *   1. Platform Governance -> /superadmin
+ *   2. Organization Admin Control Center -> /dashboard
+ *   3. Explicit Primary Department -> /[dept]
+ *   4. Exactly one accessible department -> /[dept]
+ *   5. Multi-department Hub -> /workspace
+ */
+export function resolveDashboardRoute(
+  ctx: UserAuthContext,
+  detectedTenantFromHost?: string | null
+): string {
+  // 1. Platform Governance Superadmin
+  if (ctx.is_superadmin || ctx.permissions?.includes('*')) {
+    return '/superadmin';
+  }
+
+  const tenantSlug = ctx.tenant_slug || ctx.organization?.slug || detectedTenantFromHost || '';
+  const basePrefix = detectedTenantFromHost ? '' : (tenantSlug ? `/${tenantSlug}` : '');
+
+  // 2. Organization Management Capability
+  const hasOrgAdminPerm =
+    ctx.is_org_admin ||
+    ctx.permissions?.includes('org.admin.control_center') ||
+    ctx.permissions?.includes('org.admin.access');
+
+  if (hasOrgAdminPerm) {
+    return basePrefix ? `${basePrefix}/dashboard` : '/dashboard';
+  }
+
+  // 3. Explicit Primary Department
+  const primaryDept = ctx.departments?.find((d) => d.is_primary);
+  if (primaryDept?.slug) {
+    return basePrefix ? `${basePrefix}/${primaryDept.slug}` : `/${primaryDept.slug}`;
+  }
+
+  // 4. Exactly one accessible department
+  if (ctx.departments && ctx.departments.length === 1 && ctx.departments[0].slug) {
+    return basePrefix ? `${basePrefix}/${ctx.departments[0].slug}` : `/${ctx.departments[0].slug}`;
+  }
+
+  // 5. Multi-Department Hub / General Employee Portal
+  return basePrefix ? `${basePrefix}/workspace` : '/workspace';
+}
