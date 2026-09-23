@@ -1,0 +1,469 @@
+
+<style>
+.wrap{padding:8px 0}
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:6px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface-1);color:var(--text-secondary);font-size:12px;cursor:pointer;transition:all .15s}
+.tab.active{background:var(--bg-accent);border-color:var(--border-accent);color:var(--text-accent);font-weight:500}
+.tab:hover:not(.active){border-color:var(--border-strong);color:var(--text-primary)}
+#erd-wrap svg{width:100% !important;height:auto !important}
+</style>
+<div class="wrap">
+  <h2 class="sr-only">Database architecture ERD for the Multi-Tenant Domain-Based Enterprise RAG Platform showing all tables and their relationships</h2>
+  <div class="tabs">
+    <button class="tab active" onclick="show('full')">Full schema</button>
+    <button class="tab" onclick="show('auth')">Auth & tenants</button>
+    <button class="tab" onclick="show('docs')">Documents & vectors</button>
+    <button class="tab" onclick="show('chat')">Chat & RAG</button>
+    <button class="tab" onclick="show('billing')">Billing & usage</button>
+  </div>
+  <div id="erd-wrap"></div>
+</div>
+
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const themeMode = document.documentElement.dataset.mode;
+const dark = themeMode ? themeMode === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"anthropic-sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '12px',
+    fontFamily: '"anthropic-sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+    primaryColor: dark ? '#3C3489' : '#EEEDFE',
+    primaryTextColor: dark ? '#CECBF6' : '#26215C',
+    primaryBorderColor: dark ? '#534AB7' : '#534AB7',
+    secondaryColor: dark ? '#085041' : '#E1F5EE',
+    secondaryTextColor: dark ? '#9FE1CB' : '#04342C',
+    secondaryBorderColor: dark ? '#1D9E75' : '#1D9E75',
+    tertiaryColor: dark ? '#633806' : '#FAEEDA',
+    tertiaryTextColor: dark ? '#FAC775' : '#412402',
+    tertiaryBorderColor: dark ? '#BA7517' : '#BA7517',
+    noteBkgColor: dark ? '#444441' : '#F1EFE8',
+    noteTextColor: dark ? '#D3D1C7' : '#2C2C2A',
+  }
+});
+
+const diagrams = {
+
+full: `erDiagram
+  TENANTS ||--o{ USERS : "has"
+  TENANTS ||--o{ TENANT_DOMAINS : "activates"
+  DOMAINS ||--o{ TENANT_DOMAINS : "belongs to"
+  USERS ||--o{ USER_DOMAIN_ROLES : "assigned"
+  DOMAINS ||--o{ USER_DOMAIN_ROLES : "scopes"
+  USERS ||--o{ INVITE_TOKENS : "sends"
+  TENANTS ||--o{ INVITE_TOKENS : "scoped to"
+  USERS ||--o{ SESSIONS : "owns"
+  TENANTS ||--o{ DOCUMENTS : "owns"
+  DOMAINS ||--o{ DOCUMENTS : "scopes"
+  USERS ||--o{ DOCUMENTS : "uploads"
+  DOCUMENTS ||--o{ DOCUMENT_CHUNKS : "split into"
+  DOCUMENT_CHUNKS ||--|| VECTOR_REFERENCES : "has"
+  DOCUMENTS ||--o{ PROCESSING_JOBS : "tracked by"
+  USERS ||--o{ CONVERSATIONS : "starts"
+  TENANTS ||--o{ CONVERSATIONS : "scoped to"
+  DOMAINS ||--o{ CONVERSATIONS : "scoped to"
+  CONVERSATIONS ||--o{ MESSAGES : "contains"
+  MESSAGES ||--o{ RETRIEVAL_LOGS : "logged in"
+  TENANTS ||--|| SUBSCRIPTIONS : "has"
+  TENANTS ||--o{ USAGE_RECORDS : "metered by"
+
+  TENANTS {
+    uuid id PK
+    string name
+    string slug
+    string subdomain
+    string plan
+    string status
+    timestamp created_at
+  }
+  DOMAINS {
+    uuid id PK
+    string name
+    string slug
+    boolean is_active
+  }
+  TENANT_DOMAINS {
+    uuid tenant_id FK
+    uuid domain_id FK
+    jsonb config
+    timestamp activated_at
+  }
+  USERS {
+    uuid id PK
+    uuid tenant_id FK
+    string email
+    string password_hash
+    string full_name
+    string status
+    timestamp created_at
+  }
+  USER_DOMAIN_ROLES {
+    uuid user_id FK
+    uuid domain_id FK
+    string role
+    uuid granted_by FK
+    timestamp granted_at
+  }
+  INVITE_TOKENS {
+    uuid id PK
+    uuid tenant_id FK
+    uuid invited_by FK
+    string email
+    jsonb domain_roles
+    timestamp expires_at
+    timestamp used_at
+  }
+  SESSIONS {
+    uuid id PK
+    uuid user_id FK
+    string refresh_token_hash
+    string ip_address
+    timestamp expires_at
+  }
+  DOCUMENTS {
+    uuid id PK
+    uuid tenant_id FK
+    uuid domain_id FK
+    uuid user_id FK
+    string filename
+    string mime_type
+    string s3_key
+    string status
+    int page_count
+    timestamp created_at
+  }
+  DOCUMENT_CHUNKS {
+    uuid id PK
+    uuid document_id FK
+    uuid tenant_id FK
+    uuid domain_id FK
+    int chunk_index
+    text content
+    vector embedding
+    jsonb metadata
+    timestamp created_at
+  }
+  VECTOR_REFERENCES {
+    uuid chunk_id FK
+    string collection
+    string point_id
+  }
+  PROCESSING_JOBS {
+    uuid id PK
+    uuid document_id FK
+    string status
+    string error
+    timestamp started_at
+    timestamp completed_at
+  }
+  CONVERSATIONS {
+    uuid id PK
+    uuid tenant_id FK
+    uuid domain_id FK
+    uuid user_id FK
+    string title
+    timestamp created_at
+  }
+  MESSAGES {
+    uuid id PK
+    uuid conversation_id FK
+    string role
+    text content
+    jsonb sources
+    int token_count
+    timestamp created_at
+  }
+  RETRIEVAL_LOGS {
+    uuid id PK
+    uuid message_id FK
+    jsonb retrieved_chunks
+    jsonb rerank_scores
+    timestamp created_at
+  }
+  SUBSCRIPTIONS {
+    uuid id PK
+    uuid tenant_id FK
+    string stripe_customer_id
+    string stripe_subscription_id
+    string plan
+    string status
+    timestamp created_at
+  }
+  USAGE_RECORDS {
+    uuid id PK
+    uuid tenant_id FK
+    uuid domain_id FK
+    date period_start
+    date period_end
+    int tokens_used
+    int api_calls
+    bigint storage_bytes
+  }`,
+
+auth: `erDiagram
+  TENANTS ||--o{ USERS : "has many"
+  TENANTS ||--o{ TENANT_DOMAINS : "activates"
+  DOMAINS ||--o{ TENANT_DOMAINS : "used by"
+  USERS ||--o{ USER_DOMAIN_ROLES : "assigned"
+  DOMAINS ||--o{ USER_DOMAIN_ROLES : "scopes"
+  USERS ||--o{ SESSIONS : "owns"
+  TENANTS ||--o{ INVITE_TOKENS : "scoped to"
+  USERS ||--o{ INVITE_TOKENS : "invites"
+
+  TENANTS {
+    uuid id PK
+    string name
+    string slug
+    string subdomain
+    string plan
+    string status
+    timestamp created_at
+  }
+  DOMAINS {
+    uuid id PK
+    string name
+    string slug
+    string description
+    boolean is_active
+  }
+  TENANT_DOMAINS {
+    uuid tenant_id FK
+    uuid domain_id FK
+    jsonb config
+    timestamp activated_at
+  }
+  USERS {
+    uuid id PK
+    uuid tenant_id FK
+    string email
+    string password_hash
+    string full_name
+    string status
+    timestamp created_at
+  }
+  USER_DOMAIN_ROLES {
+    uuid user_id FK
+    uuid domain_id FK
+    string role
+    uuid granted_by
+    timestamp granted_at
+  }
+  SESSIONS {
+    uuid id PK
+    uuid user_id FK
+    string refresh_token_hash
+    string ip_address
+    string user_agent
+    timestamp expires_at
+    timestamp created_at
+  }
+  INVITE_TOKENS {
+    uuid id PK
+    uuid tenant_id FK
+    uuid invited_by FK
+    string email
+    jsonb domain_roles
+    timestamp expires_at
+    timestamp used_at
+    timestamp created_at
+  }`,
+
+docs: `erDiagram
+  TENANTS ||--o{ DOCUMENTS : "owns"
+  DOMAINS ||--o{ DOCUMENTS : "scopes"
+  USERS ||--o{ DOCUMENTS : "uploads"
+  DOCUMENTS ||--o{ DOCUMENT_CHUNKS : "split into"
+  DOCUMENTS ||--o{ PROCESSING_JOBS : "tracked by"
+  DOCUMENT_CHUNKS ||--|| VECTOR_REFERENCES : "mapped to"
+
+  DOCUMENTS {
+    uuid id PK
+    uuid tenant_id FK
+    uuid domain_id FK
+    uuid user_id FK
+    string filename
+    string original_name
+    string mime_type
+    string s3_key
+    string status
+    int page_count
+    bigint file_size_bytes
+    jsonb extracted_metadata
+    timestamp created_at
+    timestamp updated_at
+  }
+  DOCUMENT_CHUNKS {
+    uuid id PK
+    uuid document_id FK
+    uuid tenant_id FK
+    uuid domain_id FK
+    int chunk_index
+    text content
+    vector embedding
+    int token_count
+    jsonb metadata
+    tsvector content_tsv
+    timestamp created_at
+  }
+  VECTOR_REFERENCES {
+    uuid chunk_id FK
+    string collection_name
+    string point_id
+    timestamp indexed_at
+  }
+  PROCESSING_JOBS {
+    uuid id PK
+    uuid document_id FK
+    string status
+    string stage
+    string error_message
+    int retry_count
+    timestamp queued_at
+    timestamp started_at
+    timestamp completed_at
+  }`,
+
+chat: `erDiagram
+  USERS ||--o{ CONVERSATIONS : "starts"
+  TENANTS ||--o{ CONVERSATIONS : "scoped to"
+  DOMAINS ||--o{ CONVERSATIONS : "scoped to"
+  CONVERSATIONS ||--o{ MESSAGES : "contains"
+  MESSAGES ||--o{ RETRIEVAL_LOGS : "logged by"
+  DOCUMENT_CHUNKS ||--o{ RETRIEVAL_LOGS : "retrieved in"
+
+  CONVERSATIONS {
+    uuid id PK
+    uuid tenant_id FK
+    uuid domain_id FK
+    uuid user_id FK
+    string title
+    string status
+    int message_count
+    timestamp created_at
+    timestamp updated_at
+  }
+  MESSAGES {
+    uuid id PK
+    uuid conversation_id FK
+    string role
+    text content
+    jsonb sources
+    int token_count
+    int prompt_tokens
+    int completion_tokens
+    string model_used
+    timestamp created_at
+  }
+  RETRIEVAL_LOGS {
+    uuid id PK
+    uuid message_id FK
+    string query_text
+    jsonb retrieved_chunks
+    jsonb rerank_scores
+    float retrieval_latency_ms
+    float rerank_latency_ms
+    int top_k
+    timestamp created_at
+  }
+  DOCUMENT_CHUNKS {
+    uuid id PK
+    uuid document_id FK
+    uuid tenant_id FK
+    uuid domain_id FK
+    int chunk_index
+    text content
+    vector embedding
+    jsonb metadata
+    timestamp created_at
+  }`,
+
+billing: `erDiagram
+  TENANTS ||--|| SUBSCRIPTIONS : "has"
+  TENANTS ||--o{ USAGE_RECORDS : "metered by"
+  TENANTS ||--o{ BILLING_ALERTS : "notified by"
+  DOMAINS ||--o{ USAGE_RECORDS : "tracked per"
+
+  SUBSCRIPTIONS {
+    uuid id PK
+    uuid tenant_id FK
+    string stripe_customer_id
+    string stripe_subscription_id
+    string plan
+    string status
+    int max_domains
+    int max_users
+    bigint storage_limit_bytes
+    int token_limit_monthly
+    timestamp current_period_start
+    timestamp current_period_end
+    timestamp created_at
+  }
+  USAGE_RECORDS {
+    uuid id PK
+    uuid tenant_id FK
+    uuid domain_id FK
+    date period_start
+    date period_end
+    int tokens_used
+    int embedding_tokens
+    int completion_tokens
+    int api_calls
+    int documents_uploaded
+    bigint storage_bytes
+    timestamp created_at
+  }
+  BILLING_ALERTS {
+    uuid id PK
+    uuid tenant_id FK
+    string threshold_type
+    int threshold_value
+    int current_value
+    string status
+    timestamp notified_at
+    timestamp created_at
+  }`
+};
+
+async function render(key) {
+  const wrap = document.getElementById('erd-wrap');
+  wrap.innerHTML = '<p style="font-size:12px;color:var(--text-muted);padding:8px">Rendering...</p>';
+  try {
+    const {svg} = await mermaid.render('erd-'+key+'-'+Date.now(), diagrams[key]);
+    wrap.innerHTML = svg;
+
+    wrap.querySelectorAll('svg .node').forEach(node => {
+      const firstPath = node.querySelector('path[d]');
+      if (!firstPath) return;
+      const d = firstPath.getAttribute('d');
+      const nums = d.match(/-?[\d.]+/g)?.map(Number);
+      if (!nums || nums.length < 8) return;
+      const xs = [nums[0],nums[2],nums[4],nums[6]];
+      const ys = [nums[1],nums[3],nums[5],nums[7]];
+      const x=Math.min(...xs),y=Math.min(...ys),w=Math.max(...xs)-x,h=Math.max(...ys)-y;
+      const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      rect.setAttribute('x',x);rect.setAttribute('y',y);
+      rect.setAttribute('width',w);rect.setAttribute('height',h);
+      rect.setAttribute('rx','8');
+      for(const a of['fill','stroke','stroke-width','class','style'])
+        if(firstPath.hasAttribute(a)) rect.setAttribute(a,firstPath.getAttribute(a));
+      firstPath.replaceWith(rect);
+    });
+    wrap.querySelectorAll('svg .row-rect-odd path, svg .row-rect-even path').forEach(p=>p.setAttribute('stroke','none'));
+  } catch(e) {
+    wrap.innerHTML = '<p style="color:var(--text-danger);font-size:12px;padding:8px">'+e.message+'</p>';
+  }
+}
+
+window.show = function(key) {
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick').includes("'"+key+"'")));
+  render(key);
+};
+
+render('full');
+</script>

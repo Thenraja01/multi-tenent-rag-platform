@@ -1,0 +1,114 @@
+version: '3.8'
+
+networks:
+  nexus-network:
+    name: nexus-network
+    driver: bridge
+
+services:
+  # 1. FastAPI Multi-Tenant RAG Backend API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nexus_api_backend
+    restart: always
+    networks:
+      - nexus-network
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres-pgvector
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin_123}
+      POSTGRES_DB: ${POSTGRES_DB:-rag_multi_domain_db}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-admin_123}@postgres-pgvector:5432/${POSTGRES_DB:-rag_multi_domain_db}
+      SYNC_DATABASE_URL: postgresql://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-admin_123}@postgres-pgvector:5432/${POSTGRES_DB:-rag_multi_domain_db}
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio_password123}
+      OLLAMA_BASE_URL: http://ollama:11434
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres-pgvector:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      minio:
+        condition: service_started
+    volumes:
+      - ./storage:/app/storage
+
+  # 2. PostgreSQL 16 with pgvector Extension
+  postgres-pgvector:
+    image: pgvector/pgvector:pg16
+    container_name: nexus_api_postgres
+    restart: always
+    networks:
+      - nexus-network
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin_123}
+      POSTGRES_DB: ${POSTGRES_DB:-rag_multi_domain_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-rag_multi_domain_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 3. Redis Cache & Message Broker
+  redis:
+    image: redis:7-alpine
+    container_name: nexus_api_redis
+    restart: always
+    networks:
+      - nexus-network
+    ports:
+      - "6379:6379"
+
+  # 4. MinIO S3 Object Storage
+  minio:
+    image: minio/minio:latest
+    container_name: nexus_api_minio
+    command: server /data --console-address ":9001"
+    restart: always
+    networks:
+      - nexus-network
+    env_file:
+      - .env
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio_password123}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  # 5. Ollama LLM Container (mine-llm)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: mine-llm
+    restart: always
+    networks:
+      - nexus-network
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+volumes:
+  pgvector_data:
+  minio_data:
+  ollama_data:

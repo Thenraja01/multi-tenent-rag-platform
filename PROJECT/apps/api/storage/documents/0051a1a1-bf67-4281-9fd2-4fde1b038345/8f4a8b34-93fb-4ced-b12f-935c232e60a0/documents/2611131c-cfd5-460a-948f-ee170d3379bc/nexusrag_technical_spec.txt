@@ -1,0 +1,1 @@
+NexusRAG multi-tenant vector pipeline uses pure PostgreSQL pgvector with cosine distance.

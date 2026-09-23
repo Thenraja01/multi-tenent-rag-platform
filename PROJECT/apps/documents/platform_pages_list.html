@@ -1,0 +1,202 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{padding:16px 0;font-family:var(--font-sans)}
+.section{margin-bottom:20px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.section-header{padding:12px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
+.section-header:hover{opacity:0.85}
+.section-title{font-size:14px;font-weight:500}
+.section-sub{font-size:12px;margin-top:2px;opacity:0.75}
+.chevron{font-size:12px;transition:transform 0.2s;color:var(--text-secondary)}
+.chevron.open{transform:rotate(180deg)}
+.section-body{border-top:1px solid var(--border);display:none}
+.section-body.open{display:block}
+.page-row{display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);cursor:pointer}
+.page-row:last-child{border-bottom:none}
+.page-row:hover{background:var(--surface-1)}
+.route{font-size:11px;font-family:var(--font-mono);color:var(--text-accent);background:var(--bg-accent);padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.page-info{flex:1}
+.page-name{font-size:13px;font-weight:500;color:var(--text-primary)}
+.page-desc{font-size:12px;color:var(--text-secondary);margin-top:2px}
+.badge{font-size:10px;padding:1px 6px;border-radius:10px;font-weight:500;flex-shrink:0;margin-top:3px}
+.b-pub{background:var(--bg-success);color:var(--text-success)}
+.b-auth{background:var(--bg-warning);color:var(--text-warning)}
+.b-prot{background:var(--bg-danger);color:var(--text-danger)}
+
+.h-red{background:#FCEBEB}
+.h-purple{background:#EEEDFE}
+.h-teal{background:#E1F5EE}
+.h-blue{background:#E6F1FB}
+.h-amber{background:#FAEEDA}
+.h-coral{background:#FAECE7}
+
+[data-mode="dark"] .h-red,[data-mode="dark"] .h-purple,[data-mode="dark"] .h-teal,[data-mode="dark"] .h-blue,[data-mode="dark"] .h-amber,[data-mode="dark"] .h-coral{background:var(--surface-1)}
+
+.t-red{color:#A32D2D}
+.t-purple{color:#3C3489}
+.t-teal{color:#0F6E56}
+.t-blue{color:#185FA5}
+.t-amber{color:#854F0B}
+.t-coral{color:#993C1D}
+
+[data-mode="dark"] .t-red,[data-mode="dark"] .t-purple,[data-mode="dark"] .t-teal,[data-mode="dark"] .t-blue,[data-mode="dark"] .t-amber,[data-mode="dark"] .t-coral{color:var(--text-primary)}
+
+.legend{display:flex;gap:16px;padding:0 0 16px;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-secondary)}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+.ld-pub{background:var(--text-success)}
+.ld-auth{background:var(--text-warning)}
+.ld-prot{background:var(--text-danger)}
+.count{font-size:11px;color:var(--text-muted);font-weight:400;margin-left:6px}
+</style>
+
+<div class="wrap">
+<div class="legend">
+  <div class="leg"><div class="leg-dot ld-pub"></div>Public</div>
+  <div class="leg"><div class="leg-dot ld-auth"></div>Auth required</div>
+  <div class="leg"><div class="leg-dot ld-prot"></div>Role protected</div>
+</div>
+
+<div id="sections"></div>
+</div>
+
+<script>
+const data = [
+  {
+    id:"public", label:"Public / Auth pages", sub:"No login required", color:"teal", pages:[
+      {name:"Landing page", route:"/", desc:"Platform homepage, pricing, features", badge:"pub"},
+      {name:"Login", route:"/login", desc:"Email + password, SSO via Keycloak", badge:"pub"},
+      {name:"Register / Sign up", route:"/register", desc:"New tenant self-signup", badge:"pub"},
+      {name:"Forgot password", route:"/forgot-password", desc:"Send reset link", badge:"pub"},
+      {name:"Reset password", route:"/reset-password", desc:"Token-based password reset", badge:"pub"},
+      {name:"Accept invite", route:"/invite/[token]", desc:"User accepts tenant invitation email", badge:"pub"},
+      {name:"Error 404", route:"/404", desc:"Page not found", badge:"pub"},
+      {name:"Error 403", route:"/403", desc:"Access denied / wrong domain", badge:"pub"},
+    ]
+  },
+  {
+    id:"platform", label:"Platform admin", sub:"Anthropic / super admin layer", color:"red", pages:[
+      {name:"Platform dashboard", route:"/platform/dashboard", desc:"Tenant count, usage, revenue overview", badge:"prot"},
+      {name:"Tenant management", route:"/platform/tenants", desc:"List, create, suspend, delete tenants", badge:"prot"},
+      {name:"Tenant detail", route:"/platform/tenants/[id]", desc:"Domains, users, usage per tenant", badge:"prot"},
+      {name:"Billing & subscriptions", route:"/platform/billing", desc:"Stripe plans, invoices, upgrades", badge:"prot"},
+      {name:"Global user management", route:"/platform/users", desc:"All users across all tenants", badge:"prot"},
+      {name:"LLM & model config", route:"/platform/models", desc:"OpenAI keys, model routing, limits", badge:"prot"},
+      {name:"Domain registry", route:"/platform/domains", desc:"Register / deactivate domain types", badge:"prot"},
+      {name:"Audit log viewer", route:"/platform/audit", desc:"All platform-wide audit events", badge:"prot"},
+      {name:"Usage & analytics", route:"/platform/analytics", desc:"Token usage, API calls, costs", badge:"prot"},
+      {name:"Platform settings", route:"/platform/settings", desc:"Global config, feature flags, maintenance", badge:"prot"},
+    ]
+  },
+  {
+    id:"tenant", label:"Tenant admin", sub:"Company admin managing their own instance", color:"purple", pages:[
+      {name:"Tenant dashboard", route:"/[tenant]/dashboard", desc:"Domain stats, user count, recent activity", badge:"auth"},
+      {name:"Domain management", route:"/[tenant]/domains", desc:"Enable/disable HR, Finance, IT, Legal…", badge:"prot"},
+      {name:"User management", route:"/[tenant]/users", desc:"Invite, edit, deactivate users", badge:"prot"},
+      {name:"Role assignment", route:"/[tenant]/users/[id]/roles", desc:"Assign domain roles to a user", badge:"prot"},
+      {name:"Invitation management", route:"/[tenant]/invitations", desc:"Pending, expired, resend invites", badge:"prot"},
+      {name:"Billing & plan", route:"/[tenant]/billing", desc:"Current plan, usage, upgrade / downgrade", badge:"prot"},
+      {name:"Audit log", route:"/[tenant]/audit", desc:"Tenant-scoped activity log", badge:"prot"},
+      {name:"Tenant settings", route:"/[tenant]/settings", desc:"Name, logo, SSO config, API keys", badge:"prot"},
+      {name:"Notification settings", route:"/[tenant]/settings/notifications", desc:"Email, alert preferences", badge:"prot"},
+    ]
+  },
+  {
+    id:"domain-common", label:"Domain — common pages", sub:"Shared across HR, Finance, IT domains", color:"blue", pages:[
+      {name:"Domain home", route:"/[tenant]/[domain]", desc:"Domain overview, quick actions, recent docs", badge:"auth"},
+      {name:"AI chat", route:"/[tenant]/[domain]/chat", desc:"Main RAG-powered AI assistant", badge:"auth"},
+      {name:"Chat history", route:"/[tenant]/[domain]/chat/history", desc:"Past conversations with AI", badge:"auth"},
+      {name:"Chat detail", route:"/[tenant]/[domain]/chat/[id]", desc:"Single conversation thread + sources", badge:"auth"},
+      {name:"Knowledge base", route:"/[tenant]/[domain]/knowledge", desc:"All indexed documents", badge:"auth"},
+      {name:"Upload document", route:"/[tenant]/[domain]/knowledge/upload", desc:"Upload + tag new documents", badge:"prot"},
+      {name:"Document detail", route:"/[tenant]/[domain]/knowledge/[id]", desc:"Preview, metadata, chunks, delete", badge:"prot"},
+      {name:"Search", route:"/[tenant]/[domain]/search", desc:"Full-text + semantic search across KB", badge:"auth"},
+      {name:"Domain settings", route:"/[tenant]/[domain]/settings", desc:"Domain admin: prompt config, retrieval", badge:"prot"},
+      {name:"Domain users", route:"/[tenant]/[domain]/users", desc:"Users with access to this domain", badge:"prot"},
+    ]
+  },
+  {
+    id:"hr", label:"HR domain — specific pages", sub:"HR Admin, Manager, HR User", color:"coral", pages:[
+      {name:"HR dashboard", route:"/[tenant]/hr", desc:"Policy updates, leave stats, headcount", badge:"auth"},
+      {name:"Policies library", route:"/[tenant]/hr/policies", desc:"All HR policies, versioned", badge:"auth"},
+      {name:"Policy detail", route:"/[tenant]/hr/policies/[id]", desc:"View, edit, version history", badge:"prot"},
+      {name:"Employee handbook", route:"/[tenant]/hr/handbook", desc:"Handbook viewer + AI Q&A", badge:"auth"},
+      {name:"Leave & attendance", route:"/[tenant]/hr/leave", desc:"Leave info, FAQs, AI queries", badge:"auth"},
+      {name:"Recruitment knowledge", route:"/[tenant]/hr/recruitment", desc:"JD templates, interview guides", badge:"prot"},
+      {name:"HR AI assistant", route:"/[tenant]/hr/chat", desc:"HR-scoped RAG chat", badge:"auth"},
+    ]
+  },
+  {
+    id:"finance", label:"Finance domain — specific pages", sub:"Finance Admin, Analyst, Finance User", color:"amber", pages:[
+      {name:"Finance dashboard", route:"/[tenant]/finance", desc:"Invoice stats, expense summary", badge:"auth"},
+      {name:"Invoice library", route:"/[tenant]/finance/invoices", desc:"All uploaded invoices", badge:"auth"},
+      {name:"Invoice detail", route:"/[tenant]/finance/invoices/[id]", desc:"Invoice view, extracted data, AI Q&A", badge:"prot"},
+      {name:"Financial reports", route:"/[tenant]/finance/reports", desc:"Uploaded reports, AI summarisation", badge:"auth"},
+      {name:"Expense knowledge", route:"/[tenant]/finance/expenses", desc:"Expense policies, FAQs", badge:"auth"},
+      {name:"Accounting knowledge", route:"/[tenant]/finance/accounting", desc:"Accounting docs, standards", badge:"prot"},
+      {name:"Finance AI assistant", route:"/[tenant]/finance/chat", desc:"Finance-scoped RAG chat", badge:"auth"},
+    ]
+  },
+  {
+    id:"it", label:"IT domain — specific pages", sub:"IT Admin, Engineer, IT User", color:"purple", pages:[
+      {name:"IT dashboard", route:"/[tenant]/it", desc:"Open incidents, doc coverage stats", badge:"auth"},
+      {name:"Technical docs", route:"/[tenant]/it/docs", desc:"All technical documentation", badge:"auth"},
+      {name:"API documentation", route:"/[tenant]/it/docs/api", desc:"API references, AI Q&A", badge:"auth"},
+      {name:"Server documentation", route:"/[tenant]/it/docs/servers", desc:"Server configs, runbooks", badge:"prot"},
+      {name:"Incident knowledge", route:"/[tenant]/it/incidents", desc:"Past incidents, resolutions", badge:"prot"},
+      {name:"Troubleshooting guide", route:"/[tenant]/it/troubleshooting", desc:"Searchable KB + AI suggestions", badge:"auth"},
+      {name:"IT AI assistant", route:"/[tenant]/it/chat", desc:"IT-scoped RAG chat", badge:"auth"},
+    ]
+  },
+  {
+    id:"account", label:"User account pages", sub:"All authenticated users", color:"teal", pages:[
+      {name:"Profile", route:"/account/profile", desc:"Name, avatar, email, password", badge:"auth"},
+      {name:"My domains", route:"/account/domains", desc:"Domains the user has access to", badge:"auth"},
+      {name:"Notification preferences", route:"/account/notifications", desc:"Email and in-app notification settings", badge:"auth"},
+      {name:"Activity log", route:"/account/activity", desc:"Personal audit trail", badge:"auth"},
+    ]
+  }
+];
+
+const badgeLabel = {pub:"Public", auth:"Auth required", prot:"Role protected"};
+
+function toggle(id){
+  const body = document.getElementById("body-"+id);
+  const chev = document.getElementById("chev-"+id);
+  const open = body.classList.toggle("open");
+  chev.classList.toggle("open", open);
+}
+
+const container = document.getElementById("sections");
+data.forEach(sec => {
+  const total = sec.pages.length;
+  const div = document.createElement("div");
+  div.className = "section";
+  div.innerHTML = `
+    <div class="section-header h-${sec.color}" onclick="toggle('${sec.id}')">
+      <div>
+        <div class="section-title t-${sec.color}">${sec.label} <span class="count">${total} pages</span></div>
+        <div class="section-sub t-${sec.color}">${sec.sub}</div>
+      </div>
+      <span class="chevron" id="chev-${sec.id}">▼</span>
+    </div>
+    <div class="section-body" id="body-${sec.id}">
+      ${sec.pages.map(p => `
+        <div class="page-row" onclick="sendPrompt('Tell me more about the ${p.name} page in the platform')">
+          <div class="page-info">
+            <div class="page-name">${p.name}</div>
+            <div class="page-desc">${p.desc}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <div class="route">${p.route}</div>
+            <div class="badge b-${p.badge}">${badgeLabel[p.badge]}</div>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+  container.appendChild(div);
+});
+
+document.getElementById("body-public").classList.add("open");
+document.getElementById("chev-public").classList.add("open");
+</script>

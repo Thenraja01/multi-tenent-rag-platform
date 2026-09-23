@@ -1,0 +1,50 @@
+{
+  "platform": {
+    "platform_name": "NexusRAG Multi-Domain Enterprise v2.5",
+    "support_email": "support@localfix.app",
+    "default_storage_quota_gb": 10,
+    "reserved_subdomains": "admin, superadmin, api, app, auth, nexus, system, billing",
+    "allow_tenant_registration": true,
+    "brand_color": "#6366f1"
+  },
+  "auth": {
+    "jwt_access_token_expire_minutes": 1440,
+    "session_idle_timeout_hours": 72,
+    "enforce_mfa_global": false,
+    "max_login_attempts_lockout": 5,
+    "allow_sso_google": true,
+    "allow_sso_github": true,
+    "allow_sso_saml": false
+  },
+  "ai": {
+    "default_chat_model": "gemini-1.5-pro",
+    "default_embedding_model": "text-embedding-3-small",
+    "default_temperature": 0.2,
+    "max_context_tokens": 8192,
+    "enable_streaming": true
+  },
+  "rag": {
+    "default_chunk_size": 512,
+    "default_chunk_overlap": 64,
+    "similarity_threshold": 0.75,
+    "enable_hybrid_search": true,
+    "vector_metric": "cosine"
+  },
+  "storage": {
+    "max_upload_size_mb": 50,
+    "allowed_mime_types": ".pdf, .docx, .txt, .csv, .json, .md",
+    "auto_deduplication": true,
+    "retention_days": 365
+  },
+  "security": {
+    "rate_limit_requests_per_min": 120,
+    "allowed_cors_origins": "http://localhost:3000, http://127.0.0.1:3000",
+    "ip_whitelist_superadmin": ""
+  },
+  "notifications": {
+    "webhook_url": "https://api.localfix.app/v1/webhooks/alerts",
+    "alert_on_tenant_creation": true,
+    "alert_on_failed_logins": true,
+    "alert_on_high_storage": true
+  }
+}

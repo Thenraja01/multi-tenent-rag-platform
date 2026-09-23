@@ -1,0 +1,27 @@
+# Tasks
+
+- [x] Create public and marketing pages: Home (`/`), About (`/about`), Platform (`/platform`), Pricing (`/pricing`, `/price`)
+- [x] Create authentication and self-service pages: Login (`/login`), Register (`/register`), Forgot Password (`/forgot-password`), Reset Password (`/reset-password`), Accept Invite (`/invite/[token]`)
+- [x] Create system error pages: Error 404 (`/404`), Error 403 (`/403`)
+- [x] Create core application architectural folders & modules in `@rag-platform/web`: `providers/`, `validation/`, `interfaces/`, `exceptions/`
+- [x] Create FastAPI backend server in `PROJECT/apps/api` with Python `venv`
+- [x] Implement clear architecture folders: `config/`, `middleware/`, `controllers/`, `services/`, `models/`, `validation/`, `modules/`, `utils/`, `public/`
+- [x] Implement `.env` and `.env.example` environment variable configuration files
+- [x] Separate Docker configurations for `apps/web` and `apps/api`
+- [x] Fix Next.js static prerendering `<Suspense>` wrapper in `app/reset-password/page.tsx`
+- [x] Implement SuperAdmin `.env` seed credentials (`SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD`, `SUPERADMIN_NAME`) and automated database seeder (`SeederService.seed_superadmin()`)
+- [x] Fix Docker `libc6-compat` and NGINX mount configuration
+- [x] Successfully build and run all master Docker containers
+- [x] Remove all hardcoded mock data across all controllers, services, and middleware, replacing them with dynamic SQLAlchemy `AsyncSession` database operations
+- [x] Implement Storage Provider abstraction (`LocalStorageProvider`, `S3StorageProvider`)
+- [x] Implement LLM Provider abstraction (`OllamaProvider`, `GeminiProvider`, `OpenAICompatibleProvider`)
+- [x] Implement Vector Store abstraction (`PgVectorStore`, `ChromaVectorStore`)
+- [x] Implement BM25 Keyword Search Engine (`BM25SearchEngine`)
+- [x] Implement Hybrid RRF Reranker (`HybridReranker`)
+- [x] Implement Domain AI Agents (`HRAgent`, `FinanceAgent`, `ITAgent`, `LegalAgent`, `OperationsAgent`)
+- [x] Implement Document Ingestion Pipeline with multi-format parsing and recursive chunking
+- [x] Implement Versioned v1 API (`/api/v1/ai`, `/api/v1/documents`, `/api/v1/knowledge`, `/api/v1/domains`, `/api/v1/conversations`, `/api/v1/audit`, `/api/v1/usage`)
+- [x] Implement real-time SSE AI token streaming endpoint (`/api/v1/ai/stream`)
+- [x] Implement automated test suite verifying tenant isolation, domain boundaries, RBAC filtering, and hybrid RRF fusion
+- [x] Remove Neo4j dependency and streamline vector + BM25 hybrid search
+- [x] Update project documentation in `API.md`, `ARCHITECTURE.md`, `RAG.md`, `DATABASE.md`, `task.md`

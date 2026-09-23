@@ -1,0 +1,197 @@
+# Hardware & Infrastructure Troubleshooting Knowledge Base: Common Server, Datacenter & Hardware Issues
+
+### Q1: How do I diagnose and resolve server thermal throttling and high CPU temperature alerts?
+**Symptom**: Server CPU clock frequency throttles from 3.2GHz down to 1.2GHz, system latency spikes, and IPMI logs display "CPU 1 Thermal Event: Temperature above critical threshold (>95C)".
+**Root Cause**: Degraded thermal interface material (TIM), blocked chassis airflow filters, or failed chassis cooling fan modules.
+**Resolution Steps**:
+1. Inspect fan telemetry via IPMI CLI: `ipmitool sdr type "Fan"`. Verify if any fan module is running below 3000 RPM or showing non-recoverable error.
+2. Clean chassis intake dust filters and inspect front-to-back chassis airflow baffles.
+3. Power down server, remove CPU heatsink, clean old thermal paste using 99% Isopropyl Alcohol, and reapply high-performance silver-based thermal paste.
+4. Re-seat heatsink with balanced torque (0.6 Nm) cross-pattern tightening.
+5. Boot system and verify temperatures under stress: `sensors` or via IPMI sensor reading.
+
+---
+
+### Q2: What is the procedure for handling uncorrectable ECC memory multi-bit errors and defective DIMM replacement?
+**Symptom**: Linux kernel panic with Machine Check Exception (MCE) or IPMI SEL log showing "Memory Device: Uncorrectable ECC Error on DIMM_A2".
+**Root Cause**: Hardware cell failure or signal degradation on physical DDR4/DDR5 registered DIMM module.
+**Resolution Steps**:
+1. Review IPMI System Event Log: `ipmitool sel list | grep -i "memory"`.
+2. Note the exact physical silk-screen channel slot (e.g., CPU1_DIMM_A2).
+3. Drain compute workload, power off server, and disconnect redundant AC power cables.
+4. Put on an anti-static ESD wrist strap grounded to chassis frame.
+5. Open memory retaining clips, pull defective DIMM, and install certified replacement module of matching speed, latency, and rank.
+6. Boot server into BIOS Setup, run MemTest86+ full pass, and verify ECC error counter is cleared.
+
+---
+
+### Q3: How do you rebuild a degraded RAID 5 / RAID 6 array after a failed SAS/SATA enterprise drive?
+**Symptom**: Hardware RAID controller (MegaRAID / PERC) LED shows flashing amber on Slot 3, status reports "DEGRADED - Drive Predictive Failure or Offline".
+**Root Cause**: Bad sectors exceeding drive reallocated sector count or sudden disk controller communication timeout.
+**Resolution Steps**:
+1. Identify failed disk slot using StorCLI / MegaCLI: `storcli /c0 /eall /sall show`.
+2. Locate physical drive slot with blinking locate LED: `storcli /c0/e252/s3 start locate`.
+3. Unlock drive tray and pull failed HDD/SSD.
+4. Mount new enterprise enterprise-grade SAS/SATA drive of equal or greater capacity into caddy.
+5. Insert new drive into Slot 3; confirm drive spin-up and auto-rebuild initiation.
+6. Check rebuild progress: `storcli /c0/v0 show rebuild`. Ensure rebuild reaches 100% and array status changes to "OPTIMAL".
+
+---
+
+### Q4: How do I troubleshoot NVMe SSD SMART critical warnings and degraded PCIe bus speeds?
+**Symptom**: NVMe SSD write throughput drops from 3500MB/s to 400MB/s, and dmesg reports "nvme0n1: PCIe Bus Error: severity=Corrected, type=Physical Layer".
+**Root Cause**: PCIe link negotiated at Gen1/Gen2 x1 instead of Gen4 x4 due to oxidized PCIe slot pins or NVMe drive controller wearout.
+**Resolution Steps**:
+1. Check NVMe SMART telemetry: `nvme smart-log /dev/nvme0`. Inspect `critical_warning`, `temperature`, `available_spare`, and `percentage_used`.
+2. Check negotiated PCIe link width and speed: `lspci -vvv -s <PCIe_Bus_ID> | grep -i "LnkSta"`.
+3. Power down, remove NVMe M.2 / U.2 drive, clean gold contacts with contact cleaner, and reseat firmly.
+4. Verify UEFI PCIe Bifurcation configuration matches backplane riser card.
+5. Benchmark I/O performance using `fio --name=randwrite --ioengine=libaio --iodepth=32 --rw=randwrite --bs=4k --direct=1 --size=2G`.
+
+---
+
+### Q5: How to recover from a corrupted BIOS/UEFI firmware after a power outage during flashing?
+**Symptom**: Server powers on with fans spinning at 100% maximum RPM, no video output, POST code display stuck at "00" or "FF", no OS boot.
+**Root Cause**: Incomplete or corrupted SPI flash memory payload during previous firmware update.
+**Resolution Steps**:
+1. Connect dedicated IPMI/BMC LAN cable and access the out-of-band management web GUI or SSH console.
+2. Navigate to "Firmware Update" -> "BIOS Recovery Mode".
+3. Upload validated vendor BIOS recovery binary (.bin/.cap) matching motherboard revision.
+4. If IPMI is unresponsive, locate the onboard "BIOS_RECOVERY" / "ME_RECOVERY" hardware jumper, move jumper from Pins 1-2 to 2-3, insert USB drive with named `AMIBOOT.ROM` into designated rear USB port, and power cycle.
+5. Allow 10 minutes for automated SPI flash rewrite, restore jumper to Pins 1-2, and boot system.
+
+---
+
+### Q6: How do you resolve PCIe GPU driver kernel panics and power delivery cable faults in AI compute nodes?
+**Symptom**: NVIDIA driver reports "NVRM: GPU 0000:41:00.0: GPU has fallen off the bus", followed by system hard lockup under high tensor compute workloads.
+**Root Cause**: 12VHPWR / PCIe 8-pin supplementary power cable pin loosening, voltage drop under transient load, or PCIe riser seating defect.
+**Resolution Steps**:
+1. Inspect IPMI hardware voltage sensors for 12V auxiliary rail drops during load.
+2. Check physical PCIe supplementary 8-pin / 16-pin power connections; inspect for plastic melting or loose contact pins.
+3. Reseat high-density PCIe Gen5 riser card in motherboard slot and verify riser lock latch engagement.
+4. Update motherboard PCIe AER (Advanced Error Reporting) settings in BIOS to standard tolerance.
+5. Run stress test: `nvidia-smi -q -d POWER,TEMPERATURE` and execute GPU burn-in benchmark for 30 minutes.
+
+---
+
+### Q7: What are the diagnostic steps for Power Supply Unit (PSU) 12V rail voltage fluctuations and N+1 redundancy failures?
+**Symptom**: Server IPMI alarm "PSU 2 Lost AC Input" or "Power Supply Redundancy Lost; Throttle engaged".
+**Root Cause**: Faulty internal PSU capacitors, failed power distribution board (PDB), or unstable PDU phase balance.
+**Resolution Steps**:
+1. Read PSU status via IPMI: `ipmitool sdr type "Power Supply"`.
+2. Verify physical AC input cords are connected to separate redundant Power Distribution Units (PDU A and PDU B).
+3. Check status LED on rear PSU: solid green indicates healthy output, blinking amber indicates AC loss or DC output fault.
+4. Hot-swap defective PSU module by squeezing release lever and pulling handle.
+5. Slide replacement identical wattage 80-Plus Platinum/Titanium PSU until click lock engages.
+6. Verify redundancy restore in IPMI dashboard: "Redundancy State: Fully Redundant".
+
+---
+
+### Q8: How to fix network interface card (NIC) link flapping and SFP28 / QSFP+ optical transceiver errors?
+**Symptom**: 25GbE/100GbE network interfaces continuously disconnect and reconnect every few minutes; kernel log shows "ixgbe/ice: Link state down / Link state up".
+**Root Cause**: Dirty optical fiber ferrule, failing SFP28/QSFP optical transceiver, or optical power Rx budget below -14 dBm.
+**Resolution Steps**:
+1. Inspect optical transceiver digital diagnostic monitoring (DDM) metrics: `ethtool -m <interface_name>`.
+2. Check `Receiver optical power` and `Laser bias current`. If Rx power is lower than -12 dBm, optical signal attenuation is too high.
+3. Unplug LC/MPO fiber patch cable, clean connector end-faces with one-click fiber optical cleaner pen, and reconnect.
+4. If errors persist, hot-swap the SFP28/QSFP28 optical transceiver module with a vendor-compatible unit.
+5. Check switch port configuration: verify Auto-Negotiation and Forward Error Correction (FEC: RS-FEC / Base-R) match on both ends.
+
+---
+
+### Q9: How to troubleshoot CPU core lockup and Machine Check Exception (MCE) bank errors?
+**Symptom**: Operating system panics with "Watchdog: BUG: soft lockup - CPU#14 stuck for 22s!", and system becomes completely unresponsive.
+**Root Cause**: Microcode defect, extreme VRM voltage drop, or defective CPU arithmetic logic core.
+**Resolution Steps**:
+1. Extract MCE crash log using `rasdaemon` or `mcelog --ascii`. Identify the reporting CPU socket and core.
+2. Check for available CPU microcode updates in Linux: `apt install intel-microcode / amd64-microcode` or update motherboard UEFI.
+3. Check BIOS CPU C-States and P-States configuration; disable deep C-states (C6/C7) if VRM voltage response is unstable.
+4. If specific physical core repeatedly triggers hardware NMI / MCE, replace CPU socket unit under vendor RMA.
+
+---
+
+### Q10: How to restore lost IPMI / BMC out-of-band management network connectivity?
+**Symptom**: BMC dedicated management IP address fails to respond to ICMP ping, SSH, or HTTPS web interface, while host OS operates normally.
+**Root Cause**: BMC firmware watchdog freeze, network MAC table desynchronization, or shared NIC VLAN misconfiguration.
+**Resolution Steps**:
+1. Issue in-band BMC cold reset from host OS using OpenIPMI driver: `ipmitool mc reset cold`.
+2. Wait 90 seconds for BMC controller reboot and attempt to ping BMC IP address.
+3. Check network configuration: `ipmitool lan print 1`. Verify IP, subnet mask, gateway, and VLAN ID.
+4. Re-apply static IP parameters: `ipmitool lan set 1 ipsrc static`, `ipmitool lan set 1 ipaddr <IP>`, `ipmitool lan set 1 netmask <NETMASK>`.
+5. If BMC remains unresponsive, perform an AC physical power cycle (pull power cords for 60 seconds to discharge motherboard capacitors).
+
+---
+
+### Q11: How do you diagnose and replace a dead CMOS / RTC battery on a server motherboard?
+**Symptom**: Server system clock reverts to `01/01/1970` or `01/01/2000` after reboot, BIOS custom settings reset to default, and TLS handshake failures occur across services.
+**Root Cause**: Depleted 3V CR2032 lithium coin-cell battery (<2.5V output).
+**Resolution Steps**:
+1. Measure RTC battery voltage via IPMI sensor: `ipmitool sensor get "VBAT"` or check BIOS Hardware Monitor screen.
+2. Schedule server maintenance window, safely shut down operating system, and disconnect power cables.
+3. Locate CR2032 coin cell on motherboard.
+4. Press spring release latch and remove old battery. Test with multimeter (healthy cell > 3.0V; exhausted cell < 2.6V).
+5. Insert fresh CR2032 lithium cell with positive (+) terminal facing up.
+6. Power on, reconfigure BIOS settings and hardware clock: `hwclock --systohc`.
+
+---
+
+### Q12: How to troubleshoot Storage Area Network (SAN) Fiber Channel LUN disconnects and HBA port offline states?
+**Symptom**: Host suddenly loses access to VM datastores or database volumes with error "SCSI: Host adapter reset requested; LUN unavailable".
+**Root Cause**: Fiber Channel HBA port link down, dirty FC patch cable, or fabric zoning misconfiguration on FC SAN switch.
+**Resolution Steps**:
+1. Inspect FC HBA host status: `cat /sys/class/fc_host/host*/port_state` and `cat /sys/class/fc_host/host*/speed`.
+2. Verify optical light levels on HBA port via SAN switch CLI (`switchshow`, `sfpshow <port>`).
+3. Check multipath status: `multipath -ll`. Ensure redundant paths (Active/Active or Active/Optimized) are configured.
+4. Test SCSI inquiry to LUNs: `rescan-scsi-bus.sh --forcerescan`.
+5. Replace damaged OM4 multi-mode fiber patch cord if bit error rate (BER) or CRC frame errors increase.
+
+---
+
+### Q13: How to diagnose server chassis cooling fan failure and excessive RPM noise alarms?
+**Symptom**: Server emits loud high-pitch siren alarm, fan status LED lights amber, and IPMI triggers "Fan 4 Failure - Lower Critical Threshold Exceeded (0 RPM)".
+**Root Cause**: Bearing seizure on dual-rotor fan module or debris obstructing impeller blades.
+**Resolution Steps**:
+1. Query fan RPM telemetry: `ipmitool sensor | grep -i fan`.
+2. Identify failed fan module position (e.g. FAN4A/FAN4B) from chassis diagram.
+3. Open top access cover (on hot-swappable chassis, top cover switch bypass is active for 5 minutes).
+4. Pull out hot-swap fan module by orange finger latches.
+5. Insert replacement genuine dual-rotor fan module; observe green LED confirmation.
+6. Verify fan tachometer reading stabilizes at standard operating speed (4500-7500 RPM).
+
+---
+
+### Q14: What is the root cause of bare-metal server boot failure with "No Bootable Device Found" error?
+**Symptom**: Server passes POST but immediately halts with screen "PXE-E61: Media test failure, check cable" and "No bootable device found".
+**Root Cause**: Boot order desynchronization in UEFI, UEFI NVRAM boot entry loss, or OS boot disk detachment.
+**Resolution Steps**:
+1. Enter UEFI BIOS Setup (F2/DEL key during boot).
+2. Check "Boot Order" list. Verify if primary OS disk / RAID volume (e.g., "Linux Boot Manager" or "Windows Boot Manager") is listed.
+3. Check "Storage Configuration" to confirm all physical SATA/SAS/NVMe disks are detected by controller.
+4. If boot entry was lost during power cut, boot into live rescue USB and recreate EFI boot entry: `efibootmgr -c -d /dev/sda -p 1 -L "Ubuntu" -l "\EFI\ubuntu\shimx64.efi"`.
+5. Set newly created EFI entry as primary in boot priority list and reboot.
+
+---
+
+### Q15: How do you diagnose and replace faulty redundant power supply backplane distribution boards (PDB)?
+**Symptom**: Both PSUs show green input LEDs, but the server motherboard completely fails to power on; pressing front power button does not trigger fan spin or POST.
+**Root Cause**: Blown MOSFET, fuse, or standby 3.3V/5V circuitry fault on the Power Distribution Board (PDB) interconnecting PSUs to the motherboard.
+**Resolution Steps**:
+1. Check IPMI 3.3V Standby power telemetry: `ipmitool sensor get "3.3VSB"`. If reading is 0.00V, power plane is inactive.
+2. Disconnect all external power cords and remove all installed PSU modules.
+3. Disconnect heavy-gauge 12V 24-pin and 8-pin EPS harnesses from motherboard.
+4. Unscrew and remove the defective PDB from the rear chassis bay.
+5. Mount replacement PDB, re-attach all cable harnesses ensuring tight click latches, and reinstall PSU modules.
+6. Verify front panel power button triggers normal POST startup sequence.
+
+---
+
+### Q16: How to identify and fix Thermal Interface Material (TIM) dry-out on legacy enterprise server processors?
+**Symptom**: Idle temperatures remain acceptable (40C), but within 10 seconds of starting compute workloads, temperatures spike to 100C triggering emergency shutdown.
+**Root Cause**: Factory thermal paste has completely dried out, cracked, and lost thermal conductivity after 3-5 years in service.
+**Resolution Steps**:
+1. Monitor real-time core temperature gradient under synthetic load using `turbostat` or `coretemp`.
+2. Observe if delta between CPU cores exceeds 20C (indicates uneven thermal paste contact).
+3. Shut down system, remove CPU heatsink assembly carefully with slight rotational twist.
+4. Inspect contact plate for dry chalky residue. Clean surfaces with ArctiClean / Isopropyl Alcohol until copper surface shines.
+5. Apply pea-sized dot of industrial phase-change thermal pad or non-conductive high-viscosity paste.
+6. Re-torque heatsink screws in diagonal order (1-3-2-4) to vendor torque specification.

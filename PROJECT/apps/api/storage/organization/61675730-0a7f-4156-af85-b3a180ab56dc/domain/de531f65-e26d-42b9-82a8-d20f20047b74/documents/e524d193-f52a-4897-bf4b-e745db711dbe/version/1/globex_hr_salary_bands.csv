@@ -1,0 +1,6 @@
+Job_Code,Job_Title,Department,Grade,Min_Salary_USD,Max_Salary_USD
+HR-101,HR Coordinator,Human Resources,L2,55000,70000
+HR-102,HR Business Partner,Human Resources,L4,85000,110000
+HR-103,VP of People & Culture,Human Resources,L7,160000,210000
+ENG-201,Software Engineer II,Engineering,L3,95000,125000
+ENG-202,Principal Engineer,Engineering,L6,175000,230000

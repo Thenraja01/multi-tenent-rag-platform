@@ -1,0 +1,120 @@
+How can I open a bank account?
+A: You can open an account online through our website or visit any branch with the required identity and address documents.
+Q: What documents are required to open an account?
+A: You generally need valid identity proof, address proof, a recent photograph, and any additional documents required for the selected account type.
+Q: How long does it take to open an account?
+A: Online applications are typically processed within 1–3 business days, subject to successful verification.
+Q: Can I open an account online?
+A: Yes, eligible customers can complete the account-opening process online through our digital banking platform.
+Q: What is the minimum balance requirement?
+A: The minimum balance depends on the type of account and the applicable account terms.
+Q: Can I open a zero-balance account?
+A: Yes, certain account products may be available without a minimum balance requirement.
+Q: How do I update my address?
+A: You can request an address update through online banking or visit a branch with valid address proof.
+Q: How can I update my mobile number?
+A: Your registered mobile number can usually be updated through the bank's approved digital or branch-based verification process.
+Q: How do I change my registered email address?
+A: You can update your email address through online banking or by submitting a request at a branch.
+Q: How can I check my account balance?
+A: You can check your balance through mobile banking, internet banking, ATMs, or by visiting a branch.
+Q: How can I download my bank statement?
+A: Log in to online or mobile banking and select the account statement option to download your statement.
+Q: Can I request a physical bank statement?
+A: Yes, you can request a printed statement at your branch, subject to applicable charges.
+Q: How can I get my account number?
+A: Your account number is available through your account documents, online banking, mobile banking, or branch assistance.
+Q: How do I find my IFSC code?
+A: You can find the IFSC code on your cheque book, bank statement, official website, or branch information.
+Q: How can I activate mobile banking?
+A: Download the official mobile banking application and follow the registration and verification instructions.
+Q: How do I register for internet banking?
+A: You can register through the official internet banking portal using your account and verification details.
+Q: What should I do if I forget my internet banking password?
+A: Use the password-reset option on the official banking portal and complete the required verification.
+Q: How can I change my internet banking password?
+A: Log in to internet banking and use the security or password management section.
+Q: What should I do if my mobile banking app is locked?
+A: Follow the app's account recovery process or contact customer support for assistance.
+Q: How can I reset my mobile banking PIN?
+A: Use the PIN reset option in the mobile banking application or contact the bank if additional verification is required.
+Q: How can I apply for a debit card?
+A: You can request a debit card through online banking or by visiting your branch.
+Q: How long does it take to receive a debit card?
+A: Delivery times vary by location but are generally communicated when the card is issued.
+Q: How do I activate my debit card?
+A: Follow the activation instructions provided with the card or use the bank's approved ATM or digital banking process.
+Q: What should I do if my debit card is lost?
+A: Immediately block the card through mobile banking or customer support and request a replacement card.
+Q: How can I change my debit card PIN?
+A: You can change your PIN through an eligible ATM or the bank's approved digital banking channel.
+Q: What should I do if my debit card expires?
+A: A replacement card is generally issued before expiry. Contact the bank if you do not receive it.
+Q: Can I use my debit card internationally?
+A: International usage depends on your card type and whether international transactions are enabled.
+Q: How can I enable international transactions?
+A: International transactions can generally be enabled through mobile banking, internet banking, or customer support.
+Q: What should I do if my card transaction is declined?
+A: Check your available balance, card limits, transaction settings, and card status. Contact support if the issue continues.
+Q: How can I increase my transaction limit?
+A: Depending on the product, you may request a higher limit through digital banking or customer support.
+Q: How can I transfer money to another bank account?
+A: You can transfer funds using available payment services through mobile banking, internet banking, or a branch.
+Q: How long does a bank transfer take?
+A: Transfer times depend on the payment method, receiving bank, transaction time, and applicable processing rules.
+Q: Can I schedule a future transfer?
+A: Yes, eligible banking channels may allow you to schedule transfers for a future date.
+Q: Can I cancel a bank transfer?
+A: Cancellation depends on whether the transaction has already been processed. Contact the bank immediately if cancellation is required.
+Q: What should I do if money is deducted but the transfer fails?
+A: Contact customer support with the transaction details. The bank will investigate and process any applicable reversal.
+Q: How can I set up a recurring payment?
+A: You can establish recurring payments through eligible digital banking or payment services.
+Q: How can I stop a recurring payment?
+A: You can request cancellation through the relevant payment service or contact the bank for assistance.
+Q: Can I make international money transfers?
+A: Yes, international transfers are available for eligible customers subject to applicable regulations and documentation.
+Q: What information is needed for an international transfer?
+A: Depending on the destination, you may need the recipient's name, account details, bank information, and applicable international transfer codes.
+Q: Are there fees for money transfers?
+A: Transfer fees vary depending on the transfer method, destination, account type, and transaction amount.
+Q: How can I apply for a personal loan?
+A: You can apply online or visit a branch to discuss eligibility, documentation, and available loan products.
+Q: What documents are required for a personal loan?
+A: Requirements vary, but may include identity documents, income proof, bank statements, employment details, and address proof.
+Q: How long does loan approval take?
+A: Approval time depends on the loan type, application completeness, verification, and eligibility assessment.
+Q: How can I check my loan application status?
+A: You can check the status through online banking, the application portal, or customer support.
+Q: Can I repay my loan early?
+A: Early repayment may be available depending on your loan agreement and applicable terms or charges.
+Q: How can I pay my loan installment?
+A: Loan installments can generally be paid through automatic debit, online banking, mobile banking, or other approved methods.
+Q: What happens if I miss a loan payment?
+A: A missed payment may result in applicable charges and can affect your repayment record. Contact the bank promptly for assistance.
+Q: How can I apply for a credit card?
+A: You can apply through the bank's official website, mobile application, or a branch.
+Q: How can I check my credit card balance?
+A: Your balance is available through mobile banking, internet banking, statements, or other approved channels.
+Q: How do I pay my credit card bill?
+A: You can pay through online banking, mobile banking, bank transfer, ATM, or other available payment methods.
+Q: Can I convert a credit card purchase into installments?
+A: Eligible transactions may be converted into installments subject to the card's applicable terms.
+Q: What should I do if I notice an unauthorized transaction?
+A: Report the transaction immediately through the bank's official customer support or card-blocking channel.
+Q: How can I protect my banking account from fraud?
+A: Never share your PIN, password, OTP, or security credentials, and only use official banking applications and websites.
+Q: Will the bank ever ask for my OTP?
+A: You should never disclose an OTP to anyone claiming to represent the bank.
+Q: How can I report a suspicious banking message?
+A: Forward or report the message through the bank's official fraud-reporting or customer-support channel.
+Q: Can I add a nominee to my account?
+A: Yes, eligible accounts can generally have a nominee registered according to the bank's procedures.
+Q: How can I change my nominee?
+A: You can request a nominee change through the approved digital or branch process.
+Q: Can I have a joint bank account?
+A: Yes, the bank offers eligible joint-account options depending on the account type.
+Q: Can I convert my individual account into a joint account?
+A: This may be possible depending on the account product and required verification.
+Q: How can I close my bank account?
+A: Submit an account-closure request through the applicable branch or digital process after completing outstanding obligations.

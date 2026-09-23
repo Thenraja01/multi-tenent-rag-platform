@@ -1,0 +1,444 @@
+{
+  "superadmin": {
+    "email": "superadmin@localfix.app",
+    "full_name": "Platform SuperAdmin",
+    "default_password": "Test@123"
+  },
+  "canonical_roles": [
+    {
+      "slug": "superadmin",
+      "name": "Super Admin",
+      "description": "Platform-wide system administrator with global authority.",
+      "is_system": true,
+      "is_global": true,
+      "default_permissions": ["*"]
+    },
+    {
+      "slug": "org_admin",
+      "name": "Organization Administrator",
+      "description": "Organization administrator with full tenant-wide management capabilities.",
+      "is_system": true,
+      "is_global": false,
+      "default_permissions": [
+        "tenant:manage",
+        "domain:manage",
+        "module:manage",
+        "user:read",
+        "user:create",
+        "user:update",
+        "user:delete",
+        "employee:read",
+        "employee:create",
+        "employee:update",
+        "employee:delete",
+        "role:read",
+        "role:create",
+        "role:update",
+        "permission:assign",
+        "document:read",
+        "document:create",
+        "document:update",
+        "document:delete",
+        "rag:search",
+        "rag:ask",
+        "rag:manage",
+        "attendance:view",
+        "attendance:manage",
+        "attendance:report",
+        "leave:view",
+        "leave:approve",
+        "hr.attendance.read",
+        "hr.attendance.update",
+        "hr.leave.read",
+        "hr.leave.approve",
+        "hr.documents.read",
+        "finance.expenses.read",
+        "finance.expenses.create",
+        "finance.expenses.update",
+        "finance.invoices.read",
+        "finance.reports.read",
+        "finance.documents.read",
+        "it.assets.read",
+        "it.tickets.read",
+        "it.documents.read"
+      ]
+    },
+    {
+      "slug": "department_admin",
+      "name": "Department Admin",
+      "description": "Department administrator with management authority scoped to assigned department.",
+      "is_system": true,
+      "is_global": false,
+      "default_permissions": [
+        "domain:manage",
+        "module:manage",
+        "user:read",
+        "employee:read",
+        "employee:update",
+        "document:read",
+        "document:create",
+        "document:update",
+        "document:delete",
+        "rag:search",
+        "rag:ask",
+        "attendance:view",
+        "attendance:manage",
+        "attendance:report",
+        "leave:view",
+        "leave:approve",
+        "hr.attendance.read",
+        "hr.attendance.update",
+        "hr.leave.read",
+        "hr.leave.approve",
+        "hr.documents.read",
+        "finance.expenses.read",
+        "finance.expenses.update",
+        "finance.documents.read",
+        "it.tickets.read",
+        "it.documents.read"
+      ]
+    },
+    {
+      "slug": "manager",
+      "name": "Manager",
+      "description": "Business department manager with operational review and approval authority.",
+      "is_system": true,
+      "is_global": false,
+      "default_permissions": [
+        "user:read",
+        "employee:read",
+        "document:read",
+        "document:create",
+        "rag:search",
+        "rag:ask",
+        "attendance:view",
+        "attendance:report",
+        "leave:view",
+        "leave:approve",
+        "hr.attendance.read",
+        "hr.leave.read",
+        "hr.leave.approve",
+        "hr.documents.read",
+        "finance.expenses.read",
+        "finance.expenses.update",
+        "finance.documents.read"
+      ]
+    },
+    {
+      "slug": "support",
+      "name": "Support Specialist",
+      "description": "Operational support staff member handling tickets and customer/system inquiries.",
+      "is_system": true,
+      "is_global": false,
+      "default_permissions": [
+        "user:read",
+        "document:read",
+        "rag:search",
+        "rag:ask",
+        "it.tickets.read",
+        "it.assets.read",
+        "it.documents.read"
+      ]
+    },
+    {
+      "slug": "emp",
+      "name": "Employee",
+      "description": "Standard organization employee with basic department workspace and self-service capabilities.",
+      "is_system": true,
+      "is_global": false,
+      "default_permissions": [
+        "employee:read",
+        "document:read",
+        "document:create",
+        "rag:search",
+        "rag:ask",
+        "attendance:view",
+        "attendance:check_in",
+        "attendance:check_out",
+        "leave:apply",
+        "leave:view",
+        "finance.expenses.create",
+        "finance.expenses.read"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "name": "HR Core",
+      "slug": "hr_core",
+      "module_type": "hr",
+      "description": "Core human resources employee profiles, organizational chart, and records.",
+      "icon": "users",
+      "route": "/hr",
+      "default_permission": "employee:read"
+    },
+    {
+      "name": "Attendance Tracking",
+      "slug": "attendance",
+      "module_type": "hr",
+      "description": "Biometric, shift scheduling, and time-clock check-in tracking.",
+      "icon": "calendar-check",
+      "route": "/attendance",
+      "default_permission": "attendance:view"
+    },
+    {
+      "name": "Leave Management",
+      "slug": "leave",
+      "module_type": "hr",
+      "description": "Paid time off (PTO), sick leave, and vacation approval workflows.",
+      "icon": "calendar-days",
+      "route": "/leave",
+      "default_permission": "leave:view"
+    },
+    {
+      "name": "HR Analytics",
+      "slug": "hr_analytics",
+      "module_type": "hr",
+      "description": "Headcount trends, retention analytics, and departmental turnover metrics.",
+      "icon": "bar-chart-3",
+      "route": "/analytics",
+      "default_permission": "employee:read"
+    },
+    {
+      "name": "Finance Dashboard",
+      "slug": "finance_dashboard",
+      "module_type": "finance",
+      "description": "Executive revenue, P&L, balance sheets, and real-time cash flow visualizers.",
+      "icon": "layout-dashboard",
+      "route": "/finance",
+      "default_permission": "finance.reports.read"
+    },
+    {
+      "name": "Invoices & OCR",
+      "slug": "invoices",
+      "module_type": "finance",
+      "description": "Automated document OCR scanning, invoice extraction, and payment pipelines.",
+      "icon": "file-text",
+      "route": "/invoices",
+      "default_permission": "finance.invoices.read"
+    },
+    {
+      "name": "Expense Claims",
+      "slug": "expense_claims",
+      "module_type": "finance",
+      "description": "Employee expense receipts, approval tiers, and reimbursement processing.",
+      "icon": "receipt",
+      "route": "/expenses",
+      "default_permission": "finance.expenses.read"
+    },
+    {
+      "name": "Knowledge Base RAG",
+      "slug": "knowledge_base",
+      "module_type": "rag",
+      "description": "Zero-trust vectorized semantic retrieval, multi-format parsing, and LLM reasoning.",
+      "icon": "bot",
+      "route": "/nexus",
+      "default_permission": "rag:search"
+    },
+    {
+      "name": "Documents & Vault",
+      "slug": "documents",
+      "module_type": "rag",
+      "description": "Central enterprise document repository and ACL access control vault.",
+      "icon": "file-text",
+      "route": "/documents",
+      "default_permission": "document:read"
+    },
+    {
+      "name": "Legal Contracts",
+      "slug": "legal_contracts",
+      "module_type": "legal",
+      "description": "NDA generation, vendor MSA drafting, clause comparison, and lifecycle management.",
+      "icon": "file-signature",
+      "route": "/legal",
+      "default_permission": "document:read"
+    },
+    {
+      "name": "Compliance & Audit",
+      "slug": "audit_compliance",
+      "module_type": "legal",
+      "description": "SOC2, HIPAA, and GDPR audit trail logs and immutable security event inspection.",
+      "icon": "shield-check",
+      "route": "/compliance",
+      "default_permission": "platform:manage"
+    },
+    {
+      "name": "Operations Workflow",
+      "slug": "operations",
+      "module_type": "operations",
+      "description": "Cross-departmental service tickets, logistics, and incident handling procedures.",
+      "icon": "workflow",
+      "route": "/operations",
+      "default_permission": "document:read"
+    },
+    {
+      "name": "Nexus AI Copilot",
+      "slug": "ai",
+      "module_type": "ai",
+      "description": "Multi-model reasoning assistant with localized department RAG document grounding.",
+      "icon": "bot",
+      "route": "/ai",
+      "default_permission": "rag:ask"
+    },
+    {
+      "name": "Nexus Portal",
+      "slug": "nexus",
+      "module_type": "portal",
+      "description": "Department portal and contextual knowledge workspace.",
+      "icon": "bot",
+      "route": "/nexus",
+      "default_permission": "rag:ask"
+    },
+    {
+      "name": "User Directory",
+      "slug": "users",
+      "module_type": "admin",
+      "description": "Organization member management, invitations, and identity administration.",
+      "icon": "users",
+      "route": "/users",
+      "default_permission": "user:read"
+    },
+    {
+      "name": "RBAC & UBAC",
+      "slug": "roles",
+      "module_type": "admin",
+      "description": "Role-based and user-based access control policies and permission overrides.",
+      "icon": "shield",
+      "route": "/roles",
+      "default_permission": "role:read"
+    },
+    {
+      "name": "Department Management",
+      "slug": "departments",
+      "module_type": "admin",
+      "description": "Dynamic organizational departments and unit partitions.",
+      "icon": "network",
+      "route": "/departments",
+      "default_permission": "domain:manage"
+    },
+    {
+      "name": "Organization Settings",
+      "slug": "settings",
+      "module_type": "admin",
+      "description": "Tenant branding, security policies, and AI gateway configurations.",
+      "icon": "settings",
+      "route": "/settings",
+      "default_permission": "tenant:manage"
+    }
+  ],
+  "packs": [
+    {
+      "name": "HR Starter Pack",
+      "slug": "hr_starter",
+      "description": "Essential HR tools including employee records, leave management, and attendance.",
+      "modules": ["hr_core", "attendance", "leave", "hr_analytics", "ai", "nexus"]
+    },
+    {
+      "name": "Finance Suite",
+      "slug": "finance_suite",
+      "description": "Comprehensive financial analytics, OCR invoicing, and expense claims.",
+      "modules": ["finance_dashboard", "invoices", "expense_claims", "ai", "nexus"]
+    },
+    {
+      "name": "Knowledge & Legal Pro",
+      "slug": "legal_knowledge_pro",
+      "description": "Enterprise AI search, RAG knowledge base, contract workflows, and audit logging.",
+      "modules": ["knowledge_base", "documents", "legal_contracts", "audit_compliance", "ai", "nexus"]
+    },
+    {
+      "name": "Enterprise Unified Full Stack",
+      "slug": "enterprise_unified",
+      "description": "All platform modules bundled together for multi-domain enterprise organizations.",
+      "modules": [
+        "hr_core",
+        "attendance",
+        "leave",
+        "hr_analytics",
+        "finance_dashboard",
+        "invoices",
+        "expense_claims",
+        "knowledge_base",
+        "documents",
+        "legal_contracts",
+        "audit_compliance",
+        "operations",
+        "ai",
+        "nexus",
+        "users",
+        "roles",
+        "departments",
+        "settings"
+      ]
+    }
+  ],
+  "domain_prompts": {
+    "hr": "You are Nexus HR AI Copilot, a verified enterprise human resources intelligence assistant. Answer questions accurately and professionally using ONLY the provided HR policies, employee handbooks, leave regulations, and compensation documentation. Always cite source documents and page numbers for compliance.",
+    "finance": "You are Nexus Finance AI Copilot, an enterprise financial intelligence assistant. Answer questions accurately using financial audits, budget sheets, GAAP/IFRS accounting standards, and expense reimbursement policies. Precision in numerical calculations and compliance terms is mandatory.",
+    "it": "You are Nexus IT AI Copilot, a technical infrastructure and DevOps assistant. Answer questions using official technical documentation, architecture runbooks, API specs, and troubleshooting guides with exact commands and configurations.",
+    "legal": "You are Nexus Legal AI Copilot, an enterprise legal & compliance assistant. Analyze inquiries using active contracts, regulatory filings, non-disclosure agreements, and corporate compliance standards with formal clause citations.",
+    "operations": "You are Nexus Operations AI Copilot. Assist with supply chain workflows, vendor agreements, standard operating procedures (SOPs), and operational SLA guidelines.",
+    "sales": "You are Nexus Sales AI Copilot. Assist with product pricing catalogs, customer battlecards, sales playbooks, and CRM lead qualification guides."
+  },
+  "default_system_prompt": "You are Nexus AI Copilot, a secure enterprise intelligence assistant for the organization. Answer the user's question accurately using ONLY the provided verified organizational knowledge. Maintain zero-trust data boundaries and always ground answers with inline citation indices.",
+  "permissions": [
+    {"key": "*", "name": "SuperAdmin Wildcard", "resource": "platform", "action": "manage", "description": "Full platform administration wildcard"},
+    {"key": "platform:manage", "name": "Platform Management", "resource": "platform", "action": "manage", "description": "SuperAdmin full platform control"},
+    {"key": "tenant:manage", "name": "Tenant Management", "resource": "tenant", "action": "manage", "description": "Manage tenant settings"},
+    {"key": "domain:manage", "name": "Domain Management", "resource": "domain", "action": "manage", "description": "Create and configure domains and departments"},
+    {"key": "module:manage", "name": "Module Management", "resource": "module", "action": "manage", "description": "Enable, disable, and configure domain modules"},
+
+    {"key": "user:read", "name": "View Users", "resource": "user", "action": "read", "description": "View users in the organization"},
+    {"key": "user:create", "name": "Create Users", "resource": "user", "action": "create", "description": "Create new users in the organization"},
+    {"key": "user:update", "name": "Update Users", "resource": "user", "action": "update", "description": "Update user profiles and statuses"},
+    {"key": "user:delete", "name": "Delete Users", "resource": "user", "action": "delete", "description": "Deactivate or delete users"},
+
+    {"key": "employee:read", "name": "View Employees", "resource": "employee", "action": "read", "description": "View employee profiles and directory"},
+    {"key": "employee:create", "name": "Create Employees", "resource": "employee", "action": "create", "description": "Create and onboard new employees"},
+    {"key": "employee:update", "name": "Update Employees", "resource": "employee", "action": "update", "description": "Update employee records and designations"},
+    {"key": "employee:delete", "name": "Delete Employees", "resource": "employee", "action": "delete", "description": "Terminate or archive employee records"},
+    
+    {"key": "role:read", "name": "View Roles", "resource": "role", "action": "read", "description": "View RBAC roles and permissions"},
+    {"key": "role:create", "name": "Create Roles", "resource": "role", "action": "create", "description": "Create custom RBAC roles"},
+    {"key": "role:update", "name": "Update Roles", "resource": "role", "action": "update", "description": "Update RBAC roles"},
+    {"key": "role:delete", "name": "Delete Roles", "resource": "role", "action": "delete", "description": "Delete custom RBAC roles"},
+    {"key": "permission:assign", "name": "Assign Permissions", "resource": "permission", "action": "assign", "description": "Assign permissions to roles"},
+    
+    {"key": "document:read", "name": "Read Documents", "resource": "document", "action": "read", "description": "View and download documents"},
+    {"key": "document:create", "name": "Upload Documents", "resource": "document", "action": "create", "description": "Upload new documents to knowledge base"},
+    {"key": "document:update", "name": "Update Documents", "resource": "document", "action": "update", "description": "Update document metadata and access"},
+    {"key": "document:delete", "name": "Delete Documents", "resource": "document", "action": "delete", "description": "Delete documents from knowledge base"},
+    
+    {"key": "rag:search", "name": "RAG Search", "resource": "rag", "action": "search", "description": "Search knowledge base with vector retrieval"},
+    {"key": "rag:ask", "name": "Ask AI Assistant", "resource": "rag", "action": "ask", "description": "Query AI assistant with secure RAG context"},
+    {"key": "rag:manage", "name": "Manage RAG Settings", "resource": "rag", "action": "manage", "description": "Configure domain RAG parameters"},
+    
+    {"key": "attendance:view", "name": "View Attendance", "resource": "attendance", "action": "view", "description": "View personal and team attendance"},
+    {"key": "attendance:check_in", "name": "Clock In", "resource": "attendance", "action": "check_in", "description": "Record shift check-in"},
+    {"key": "attendance:check_out", "name": "Clock Out", "resource": "attendance", "action": "check_out", "description": "Record shift check-out"},
+    {"key": "attendance:create", "name": "Create Attendance Logs", "resource": "attendance", "action": "create", "description": "Manual attendance logging"},
+    {"key": "attendance:update", "name": "Update Attendance Logs", "resource": "attendance", "action": "update", "description": "Modify attendance records"},
+    {"key": "attendance:manage", "name": "Manage Attendance", "resource": "attendance", "action": "manage", "description": "Administer department attendance"},
+    {"key": "attendance:report", "name": "Attendance Reports", "resource": "attendance", "action": "report", "description": "Generate timesheet reports"},
+    
+    {"key": "leave:apply", "name": "Apply Leave", "resource": "leave", "action": "apply", "description": "Submit PTO and leave requests"},
+    {"key": "leave:view", "name": "View Leave", "resource": "leave", "action": "view", "description": "View leave balances and team calendar"},
+    {"key": "leave:approve", "name": "Approve Leave", "resource": "leave", "action": "approve", "description": "Approve or reject leave applications"},
+
+    {"key": "hr.attendance.read", "name": "HR Attendance Read", "resource": "hr", "action": "attendance.read", "description": "Read HR attendance records"},
+    {"key": "hr.attendance.update", "name": "HR Attendance Update", "resource": "hr", "action": "attendance.update", "description": "Update HR attendance records"},
+    {"key": "hr.leave.read", "name": "HR Leave Read", "resource": "hr", "action": "leave.read", "description": "Read HR leave records"},
+    {"key": "hr.leave.approve", "name": "HR Leave Approve", "resource": "hr", "action": "leave.approve", "description": "Approve HR leave applications"},
+    {"key": "hr.documents.read", "name": "HR Documents Read", "resource": "hr", "action": "documents.read", "description": "Read HR department documents"},
+
+    {"key": "finance.expenses.read", "name": "Finance Expenses Read", "resource": "finance", "action": "expenses.read", "description": "Read finance expense reports"},
+    {"key": "finance.expenses.create", "name": "Finance Expenses Create", "resource": "finance", "action": "expenses.create", "description": "Submit finance expenses"},
+    {"key": "finance.expenses.update", "name": "Finance Expenses Update", "resource": "finance", "action": "expenses.update", "description": "Review and update finance expenses"},
+    {"key": "finance.invoices.read", "name": "Finance Invoices Read", "resource": "finance", "action": "invoices.read", "description": "Read finance invoices and OCR records"},
+    {"key": "finance.reports.read", "name": "Finance Reports Read", "resource": "finance", "action": "reports.read", "description": "View financial statements and analytics"},
+    {"key": "finance.documents.read", "name": "Finance Documents Read", "resource": "finance", "action": "documents.read", "description": "Read finance department documents"},
+
+    {"key": "it.assets.read", "name": "IT Assets Read", "resource": "it", "action": "assets.read", "description": "Read IT infrastructure and asset records"},
+    {"key": "it.tickets.read", "name": "IT Tickets Read", "resource": "it", "action": "tickets.read", "description": "Read IT support tickets"},
+    {"key": "it.documents.read", "name": "IT Documents Read", "resource": "it", "action": "documents.read", "description": "Read IT technical documents"}
+  ]
+}

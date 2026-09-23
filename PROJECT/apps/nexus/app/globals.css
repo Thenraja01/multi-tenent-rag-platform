@@ -1,0 +1,652 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --background: #FFFFFF;
+    --foreground: #0F172A;
+    --card: #FFFFFF;
+    --card-foreground: #0F172A;
+    --popover: #FFFFFF;
+    --popover-foreground: #0F172A;
+    --primary: #2563EB;
+    --primary-foreground: #FFFFFF;
+    --secondary: #F1F5F9;
+    --secondary-foreground: #1E293B;
+    --muted: #F8FAFC;
+    --muted-foreground: #475569;
+    --accent: #EFF6FF;
+    --accent-foreground: #1D4ED8;
+    --destructive: #EF4444;
+    --destructive-foreground: #FFFFFF;
+    --border: #E2E8F0;
+    --input: #E2E8F0;
+    --ring: #2563EB;
+    --radius: 16px;
+  }
+
+  .dark {
+    --background: #060913;
+    --foreground: #F8FAFC;
+    --card: #0B1120;
+    --card-foreground: #F8FAFC;
+    --popover: #0B1120;
+    --popover-foreground: #F8FAFC;
+    --primary: #3B82F6;
+    --primary-foreground: #FFFFFF;
+    --secondary: #1E293B;
+    --secondary-foreground: #F8FAFC;
+    --muted: #0F172A;
+    --muted-foreground: #94A3B8;
+    --accent: #1E293B;
+    --accent-foreground: #F8FAFC;
+    --destructive: #EF4444;
+    --destructive-foreground: #FFFFFF;
+    --border: #1E293B;
+    --input: #1E293B;
+    --ring: #3B82F6;
+  }
+}
+
+/* ==========================================================================
+   Base & Global Typography Settings
+   ========================================================================== */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html:not(.dark),
+html.light {
+  color-scheme: light;
+  background-color: #FFFFFF;
+  color: #0F172A;
+}
+
+html.dark {
+  color-scheme: dark;
+  background-color: #060913;
+  color: #F8FAFC;
+}
+
+body {
+  font-family: var(--font-inter, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  overflow-x: hidden;
+  min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html:not(.dark) body,
+html.light body {
+  background-color: #FFFFFF;
+  color: #0F172A;
+}
+
+html.dark body {
+  background-color: #060913;
+  color: #F8FAFC;
+}
+
+::selection {
+  background-color: rgba(37, 99, 235, 0.25);
+  color: #1E3A8A;
+}
+
+.dark ::selection {
+  background-color: rgba(59, 130, 246, 0.4);
+  color: #FFFFFF;
+}
+
+/* ==========================================================================
+   Enterprise Visual Language: Grids & Mesh Backgrounds
+   ========================================================================== */
+.nexus-grid-pattern {
+  background-size: 36px 36px;
+  background-image: 
+    linear-gradient(to right, rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+}
+
+.dark .nexus-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(59, 130, 246, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(59, 130, 246, 0.06) 1px, transparent 1px);
+}
+
+.nexus-dots-pattern {
+  background-image: radial-gradient(rgba(37, 99, 235, 0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.dark .nexus-dots-pattern {
+  background-image: radial-gradient(rgba(59, 130, 246, 0.14) 1px, transparent 1px);
+}
+
+.nexus-cyber-grid {
+  background-size: 48px 48px;
+  background-image: 
+    linear-gradient(to right, rgba(99, 102, 241, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(99, 102, 241, 0.04) 1px, transparent 1px);
+}
+
+.dark .nexus-cyber-grid {
+  background-image: 
+    linear-gradient(to right, rgba(99, 102, 241, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(99, 102, 241, 0.08) 1px, transparent 1px);
+}
+
+/* Ambient & Hero Glows */
+.nexus-hero-glow {
+  background: radial-gradient(circle at 50% 15%, rgba(37, 99, 235, 0.08) 0%, rgba(99, 102, 241, 0.04) 35%, transparent 70%);
+}
+
+.dark .nexus-hero-glow {
+  background: radial-gradient(circle at 50% 20%, rgba(59, 130, 246, 0.18) 0%, rgba(99, 102, 241, 0.09) 35%, rgba(6, 9, 19, 0) 70%);
+}
+
+.nexus-glow-blue {
+  box-shadow: 0 0 30px -8px rgba(37, 99, 235, 0.2);
+}
+
+.dark .nexus-glow-blue {
+  box-shadow: 0 0 40px -10px rgba(59, 130, 246, 0.35);
+}
+
+.nexus-glow-indigo {
+  box-shadow: 0 0 30px -8px rgba(99, 102, 241, 0.2);
+}
+
+.dark .nexus-glow-indigo {
+  box-shadow: 0 0 40px -10px rgba(99, 102, 241, 0.35);
+}
+
+.nexus-glow-purple {
+  box-shadow: 0 0 30px -8px rgba(168, 85, 247, 0.2);
+}
+
+.dark .nexus-glow-purple {
+  box-shadow: 0 0 40px -10px rgba(168, 85, 247, 0.35);
+}
+
+.nexus-glow-emerald {
+  box-shadow: 0 0 30px -8px rgba(16, 185, 129, 0.2);
+}
+
+.dark .nexus-glow-emerald {
+  box-shadow: 0 0 40px -10px rgba(16, 185, 129, 0.35);
+}
+
+.nexus-glow-amber {
+  box-shadow: 0 0 30px -8px rgba(245, 158, 11, 0.2);
+}
+
+.dark .nexus-glow-amber {
+  box-shadow: 0 0 40px -10px rgba(245, 158, 11, 0.35);
+}
+
+/* ==========================================================================
+   Glassmorphism & Surface Elevation
+   ========================================================================== */
+.nexus-glass-panel {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+}
+
+.dark .nexus-glass-panel {
+  background: rgba(11, 17, 32, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.nexus-glass-surface {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+}
+
+.dark .nexus-glass-surface {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.nexus-glass-dropdown {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.1);
+}
+
+.dark .nexus-glass-dropdown {
+  background: rgba(11, 17, 32, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+}
+
+/* Modern Card System */
+.nexus-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .nexus-card {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+}
+
+.nexus-card:hover {
+  border-color: rgba(37, 99, 235, 0.3);
+  box-shadow: 0 12px 30px -4px rgba(37, 99, 235, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+}
+
+.dark .nexus-card:hover {
+  border-color: rgba(59, 130, 246, 0.35);
+  background: rgba(15, 23, 42, 0.9);
+  box-shadow: 0 12px 32px -6px rgba(59, 130, 246, 0.15), 0 4px 12px -2px rgba(0, 0, 0, 0.4);
+}
+
+.nexus-card-interactive {
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nexus-card-interactive:hover {
+  transform: translateY(-2px);
+}
+
+.nexus-card-interactive:active {
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   Gradient Text Utilities
+   ========================================================================== */
+.nexus-gradient-text {
+  background: linear-gradient(135deg, #1D4ED8 0%, #0284C7 50%, #7C3AED 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .nexus-gradient-text {
+  background: linear-gradient(135deg, #60A5FA 0%, #38BDF8 50%, #A78BFA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nexus-gradient-text-purple {
+  background: linear-gradient(135deg, #9333EA 0%, #4F46E5 50%, #0284C7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .nexus-gradient-text-purple {
+  background: linear-gradient(135deg, #C084FC 0%, #818CF8 50%, #38BDF8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nexus-gradient-text-emerald {
+  background: linear-gradient(135deg, #059669 0%, #0284C7 50%, #2563EB 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .nexus-gradient-text-emerald {
+  background: linear-gradient(135deg, #34D399 0%, #38BDF8 50%, #60A5FA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nexus-gradient-text-amber {
+  background: linear-gradient(135deg, #D97706 0%, #EA580C 50%, #9333EA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .nexus-gradient-text-amber {
+  background: linear-gradient(135deg, #FBBF24 0%, #F87171 50%, #C084FC 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nexus-gradient-text-silver {
+  background: linear-gradient(135deg, #0F172A 0%, #334155 50%, #64748B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .nexus-gradient-text-silver {
+  background: linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 50%, #94A3B8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ==========================================================================
+   Badges & Status Indicators
+   ========================================================================== */
+.nexus-badge-blue {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #DBEAFE;
+}
+
+.dark .nexus-badge-blue {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60A5FA;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.nexus-badge-green,
+.nexus-badge-emerald {
+  background: #F0FDF4;
+  color: #15803D;
+  border: 1px solid #DCFCE7;
+}
+
+.dark .nexus-badge-green,
+.dark .nexus-badge-emerald {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.nexus-badge-amber {
+  background: #FFFBEB;
+  color: #B45309;
+  border: 1px solid #FEF3C7;
+}
+
+.dark .nexus-badge-amber {
+  background: rgba(245, 158, 11, 0.12);
+  color: #FBBF24;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.nexus-badge-purple {
+  background: #FAF5FF;
+  color: #7E22CE;
+  border: 1px solid #F3E8FF;
+}
+
+.dark .nexus-badge-purple {
+  background: rgba(168, 85, 247, 0.12);
+  color: #C084FC;
+  border: 1px solid rgba(168, 85, 247, 0.25);
+}
+
+.nexus-badge-red {
+  background: #FEF2F2;
+  color: #B91C1C;
+  border: 1px solid #FEE2E2;
+}
+
+.dark .nexus-badge-red {
+  background: rgba(239, 68, 68, 0.12);
+  color: #F87171;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.nexus-badge-cyan {
+  background: #ECFEFF;
+  color: #0E7490;
+  border: 1px solid #CFFAFE;
+}
+
+.dark .nexus-badge-cyan {
+  background: rgba(6, 182, 212, 0.12);
+  color: #22D3EE;
+  border: 1px solid rgba(6, 182, 212, 0.25);
+}
+
+.nexus-badge-slate {
+  background: #F1F5F9;
+  color: #334155;
+  border: 1px solid #E2E8F0;
+}
+
+.dark .nexus-badge-slate {
+  background: rgba(148, 163, 184, 0.1);
+  color: #CBD5E1;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* ==========================================================================
+   Form Controls & Modern Input Styling
+   ========================================================================== */
+.nexus-input {
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 10px;
+  color: #0F172A;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  transition: all 0.15s ease-in-out;
+}
+
+.dark .nexus-input {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #F8FAFC;
+}
+
+.nexus-input:focus {
+  outline: none;
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.dark .nexus-input:focus {
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  background: rgba(15, 23, 42, 0.95);
+}
+
+.nexus-input::placeholder {
+  color: #94A3B8;
+}
+
+.dark .nexus-input::placeholder {
+  color: #64748B;
+}
+
+/* ==========================================================================
+   Buttons & Interactive Action Elements
+   ========================================================================== */
+.nexus-btn-primary {
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  font-weight: 500;
+  box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nexus-btn-primary:hover {
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  box-shadow: 0 6px 20px 0 rgba(37, 99, 235, 0.4);
+  transform: translateY(-1px);
+}
+
+.nexus-btn-primary:active {
+  transform: translateY(0);
+}
+
+.nexus-btn-secondary {
+  background: #F1F5F9;
+  color: #1E293B;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.dark .nexus-btn-secondary {
+  background: rgba(30, 41, 59, 0.7);
+  color: #F1F5F9;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nexus-btn-secondary:hover {
+  background: #E2E8F0;
+  color: #0F172A;
+}
+
+.dark .nexus-btn-secondary:hover {
+  background: rgba(51, 65, 85, 0.85);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+}
+
+.nexus-btn-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.nexus-btn-glow::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transform: rotate(30deg);
+  animation: shimmer 6s infinite;
+}
+
+/* ==========================================================================
+   Table Styling & Data Grid Display
+   ========================================================================== */
+.nexus-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.nexus-table th {
+  background: #F8FAFC;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.dark .nexus-table th {
+  background: rgba(15, 23, 42, 0.9);
+  color: #94A3B8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nexus-table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid #F1F5F9;
+  color: #1E293B;
+  font-size: 0.875rem;
+}
+
+.dark .nexus-table td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #E2E8F0;
+}
+
+.nexus-table tr:hover td {
+  background: #F8FAFC;
+}
+
+.dark .nexus-table tr:hover td {
+  background: rgba(30, 41, 59, 0.4);
+}
+
+/* ==========================================================================
+   Animations & Keyframes
+   ========================================================================== */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) rotate(30deg); }
+  100% { transform: translateX(100%) rotate(30deg); }
+}
+
+@keyframes radarPulse {
+  0% { transform: scale(0.9); opacity: 1; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 4s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2.5s infinite;
+}
+
+.animate-radar {
+  animation: radarPulse 2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+/* ==========================================================================
+   Custom Minimalist Scrollbars
+   ========================================================================== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFFFFF;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #060913;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #1E293B;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3B82F6;
+}

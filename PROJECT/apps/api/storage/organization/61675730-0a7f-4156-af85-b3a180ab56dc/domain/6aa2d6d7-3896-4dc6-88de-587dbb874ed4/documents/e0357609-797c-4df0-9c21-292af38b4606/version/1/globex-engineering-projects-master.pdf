@@ -1,0 +1,55 @@
+# GLOBEX CORPORATION — MASTER ENGINEERING PROJECTS & STATUS TRACKER (2026)
+
+## 1. Executive Summary & Project Metrics
+- Total Project Count: 5 projects in engineering registry.
+- Pending Projects Count: 3 projects (Project CyberShield, Project DataMesh, Project Titan AI).
+- In Progress Projects Count: 1 project (Project Prometheus).
+- Completed Projects Count: 1 project (Project Apollo Core).
+- Total Engineering Budget: $2,200,000 USD.
+
+## 2. Complete Project Directory & Detailed Breakdown
+
+### 1. Project Prometheus (PRJ-101)
+- Status: In Progress
+- Lead Engineer: Charlie Davis
+- Starting Date: January 15, 2026
+- Ending Date / Deadline: August 30, 2026
+- Budget: $450,000
+- Tech Stack: Distributed Rust microservices, gRPC, Apache Cassandra, Redis Cache
+- Detail: High-throughput real-time distributed ingestion engine and microservices mesh.
+
+### 2. Project CyberShield (PRJ-102)
+- Status: Pending
+- Lead Engineer: Elena Rostova
+- Starting Date: October 1, 2026
+- Ending Date / Deadline: March 31, 2027
+- Budget: $320,000
+- Tech Stack: Go, eBPF, Cilium Network Mesh, WireGuard
+- Detail: Zero-trust container security and live kernel packet inspection. Currently pending security compliance review.
+
+### 3. Project DataMesh (PRJ-103)
+- Status: Pending
+- Lead Engineer: Marcus Vance
+- Starting Date: November 15, 2026
+- Ending Date / Deadline: May 30, 2027
+- Budget: $500,000
+- Tech Stack: Apache Spark, Kafka, Apache Iceberg, Trino
+- Detail: Enterprise distributed analytical lakehouse and telemetry pipelines. Currently pending architecture board sign-off.
+
+### 4. Project Titan AI (PRJ-104)
+- Status: Pending
+- Lead Engineer: Alex Rivera
+- Starting Date: December 1, 2026
+- Ending Date / Deadline: August 15, 2027
+- Budget: $650,000
+- Tech Stack: PyTorch, Ray distributed cluster, Triton Inference Server, vLLM
+- Detail: Private on-premise LLM fine-tuning cluster and inference gateway. Currently pending GPU hardware delivery.
+
+### 5. Project Apollo Core (PRJ-105)
+- Status: Completed
+- Lead Engineer: Sarah Jenkins
+- Starting Date: June 1, 2025
+- Ending Date / Deadline: February 28, 2026
+- Budget: $280,000
+- Tech Stack: Next.js 16, TypeScript, FastAPI, PostgreSQL pgvector
+- Detail: Core web portal foundation and modular platform engine. Successfully deployed to production.

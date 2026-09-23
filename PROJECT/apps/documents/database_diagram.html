@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexusRAG — Database Architecture & Entity Relationship Diagram</title>
+  <!-- Google Fonts & Tailwind CSS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.8.0/dist/mermaid.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#1e1b4b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0b0f19;
+      color: #f3f4f6;
+    }
+    .glass-card {
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-hover:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.2);
+    }
+    .mermaid {
+      display: flex;
+      justify-center: center;
+    }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased pb-16">
+
+  <!-- Header Section -->
+  <header class="border-b border-gray-800 bg-gray-900/60 sticky top-0 z-50 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center font-bold text-white shadow-lg shadow-brand-500/20">
+          NR
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            NexusRAG Database Architecture
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">PostgreSQL 16 + pgvector</span>
+          </h1>
+          <p class="text-xs text-gray-400">Hierarchical Multi-Tenant Row-Level Security (RLS) & Role-Gated Vector Schema</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <input 
+          type="text" 
+          id="tableSearch" 
+          placeholder="Filter tables or columns..." 
+          class="bg-gray-800/80 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-brand-500 w-64"
+          onkeyup="filterTables()"
+        />
+        <a href="http://localhost:8000/docs" class="text-xs px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 transition border border-gray-700">OpenAPI Docs</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-8 space-y-12">
+
+    <!-- Overview Badges -->
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="glass-card rounded-2xl p-5 border border-indigo-500/20">
+        <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Platform Context</div>
+        <div class="text-lg font-bold text-white flex items-center justify-between">
+          <span>nexusrag.com</span>
+          <span class="text-xs font-mono px-2 py-0.5 rounded bg-brand-500/10 text-brand-400">SuperAdmin</span>
+        </div>
+        <p class="text-xs text-gray-400 mt-2">Global tenant lifecycle, subdomain assignment, & audit logging.</p>
+      </div>
+
+      <div class="glass-card rounded-2xl p-5 border border-cyan-500/20">
+        <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Tenant Subdomain</div>
+        <div class="text-lg font-bold text-cyan-400 flex items-center justify-between">
+          <span>acme.nexusrag.com</span>
+          <span class="text-xs font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300">Org Admin</span>
+        </div>
+        <p class="text-xs text-gray-400 mt-2">Isolated tenant workspace, users, roles, & departments.</p>
+      </div>
+
+      <div class="glass-card rounded-2xl p-5 border border-emerald-500/20">
+        <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Department Domain</div>
+        <div class="text-lg font-bold text-emerald-400 flex items-center justify-between">
+          <span>hr.acme.nexusrag.com</span>
+          <span class="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300">Department</span>
+        </div>
+        <p class="text-xs text-gray-400 mt-2">Scoped department workspace (HR, Tech, Finance).</p>
+      </div>
+
+      <div class="glass-card rounded-2xl p-5 border border-purple-500/20">
+        <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Vector Storage</div>
+        <div class="text-lg font-bold text-purple-400 flex items-center justify-between">
+          <span>1536d Cosine</span>
+          <span class="text-xs font-mono px-2 py-0.5 rounded bg-purple-500/10 text-purple-300">pgvector</span>
+        </div>
+        <p class="text-xs text-gray-400 mt-2">Role-gated embedding retrieval & document chunks.</p>
+      </div>
+    </section>
+
+    <!-- Visual ERD Diagram Section -->
+    <section class="glass-card rounded-3xl p-8 space-y-6">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            📊 Interactive Entity Relationship Diagram (ERD)
+          </h2>
+          <p class="text-xs text-gray-400">Complete database tables, primary keys (PK), foreign keys (FK), & security relationships.</p>
+        </div>
+        <span class="text-xs font-mono text-gray-400">PostgreSQL 16 Schema</span>
+      </div>
+
+      <!-- Mermaid ERD Render Area -->
+      <div class="mermaid overflow-x-auto py-4 bg-gray-950/60 rounded-2xl p-6 border border-gray-800">
+erDiagram
+    TENANTS ||--o{ DEPARTMENTS : "provisions"
+    TENANTS ||--o{ USERS : "owns"
+    TENANTS ||--o{ ROLES : "defines"
+    TENANTS ||--o{ DOCUMENTS : "stores"
+    TENANTS ||--o{ AUDIT_LOGS : "logs"
+
+    DEPARTMENTS ||--o{ ROLES : "scopes"
+    DEPARTMENTS ||--o{ DOCUMENT_DEPARTMENTS : "authorizes"
+
+    USERS ||--o{ CHAT_MESSAGES : "sends"
+
+    ROLES ||--o{ DOCUMENT_ROLES : "authorizes"
+
+    DOCUMENTS ||--o{ DOCUMENT_CHUNKS : "chunks"
+    DOCUMENTS ||--o{ DOCUMENT_DEPARTMENTS : "shares_with"
+    DOCUMENTS ||--o{ DOCUMENT_ROLES : "restricts_to"
+
+    TENANTS {
+        string id PK
+        string name
+        string subdomain UK
+        string org_email
+        string admin_email
+        string status
+        timestamp approved_at
+    }
+
+    DEPARTMENTS {
+        string id PK
+        string tenant_id FK
+        string name
+        string slug
+    }
+
+    USERS {
+        string id PK
+        string tenant_id FK
+        string email UK
+        string full_name
+        string role
+    }
+
+    ROLES {
+        string id PK
+        string tenant_id FK
+        string department_id FK
+        string name
+        json permissions
+    }
+
+    DOCUMENTS {
+        string id PK
+        string tenant_id FK
+        string title
+        string filename
+        string visibility
+    }
+
+    DOCUMENT_DEPARTMENTS {
+        string id PK
+        string document_id FK
+        string department_id FK
+        string tenant_id FK
+    }
+
+    DOCUMENT_ROLES {
+        string id PK
+        string document_id FK
+        string role_id FK
+        string tenant_id FK
+    }
+
+    DOCUMENT_CHUNKS {
+        string id PK
+        string document_id FK
+        string tenant_id FK
+        string domain_id FK
+        string text_content
+        vector embedding
+        string visibility
+        json allowed_roles
+    }
+
+    AUDIT_LOGS {
+        string id PK
+        string actor_id
+        string tenant_id FK
+        string action
+        timestamp timestamp
+    }
+      </div>
+    </section>
+
+    <!-- Table Details Cards Grid -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          🗄️ Detailed Table Schema Specifications
+        </h2>
+        <span class="text-xs text-gray-400">11 Database Tables Registered</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="tableGrid">
+
+        <!-- Table 1: tenants -->
+        <div class="table-card glass-card glass-card-hover rounded-2xl p-6 space-y-4 transition-all">
+          <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="h-3 w-3 rounded-full bg-brand-500"></span>
+              <h3 class="font-bold text-white font-mono text-base">tenants</h3>
+            </div>
+            <span class="text-xs font-mono text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded border border-brand-500/20">Platform Core</span>
+          </div>
+          <p class="text-xs text-gray-400">Stores platform organization accounts, SuperAdmin approval lifecycle status, and assigned subdomains.</p>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs font-mono">
+              <thead class="text-gray-400 border-b border-gray-800">
+                <tr><th class="py-1">Column</th><th class="py-1">Type</th><th class="py-1">Constraint</th></tr>
+              </thead>
+              <tbody class="divide-y divide-gray-800/60 text-gray-300">
+                <tr><td class="py-1 text-brand-300 font-semibold">id</td><td>VARCHAR</td><td>PK (UUID)</td></tr>
+                <tr><td class="py-1">name</td><td>VARCHAR(100)</td><td>NOT NULL</td></tr>
+                <tr><td class="py-1 text-emerald-400 font-semibold">subdomain</td><td>VARCHAR(50)</td><td>UNIQUE, INDEX (Assigned by SuperAdmin)</td></tr>
+                <tr><td class="py-1">org_email</td><td>VARCHAR(255)</td><td>NOT NULL</td></tr>
+                <tr><td class="py-1">admin_name</td><td>VARCHAR(100)</td><td>NOT NULL</td></tr>
+                <tr><td class="py-1">admin_email</td><td>VARCHAR(255)</td><td>NOT NULL</td></tr>
+                <tr><td class="py-1 text-amber-400 font-semibold">status</td><td>VARCHAR(20)</td><td>INDEX (pending, approved, suspended, rejected)</td></tr>
+                <tr><td class="py-1">approved_at</td><td>TIMESTAMP</td><td>NULLABLE</td></tr>
+                <tr><td class="py-1">approved_by</td><td>VARCHAR</td><td>NULLABLE</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Table 2: departments -->
+        <div class="table-card glass-card glass-card-hover rounded-2xl p-6 space-y-4 transition-all">
+          <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="h-3 w-3 rounded-full bg-emerald-500"></span>
+              <h3 class="font-bold text-white font-mono text-base">departments</h3>
+            </div>
+            <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Tenant Department</span>
+          </div>
+          <p class="text-xs text-gray-400">Stores department workspaces (HR, Tech, Finance) within an organization. `(tenant_id, slug)` is unique.</p>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs font-mono">
+              <thead class="text-gray-400 border-b border-gray-800">
+                <tr><th class="py-1">Column</th><th class="py-1">Type</th><th class="py-1">Constraint</th></tr>
+              </thead>
+              <tbody class="divide-y divide-gray-800/60 text-gray-300">
+                <tr><td class="py-1 text-brand-300 font-semibold">id</td><td>VARCHAR</td><td>PK (UUID)</td></tr>
+                <tr><td class="py-1 text-cyan-400">tenant_id</td><td>VARCHAR</td><td>FK (tenants.id), INDEX</td></tr>
+                <tr><td class="py-1">name</td><td>VARCHAR(100)</td><td>NOT NULL</td></tr>
+                <tr><td class="py-1 text-emerald-400 font-semibold">slug</td><td>VARCHAR(50)</td><td>UNIQUE(tenant_id, slug), INDEX</td></tr>
+                <tr><td class="py-1">description</td><td>VARCHAR(255)</td><td>NULLABLE</td></tr>
+                <tr><td class="py-1">status</td><td>VARCHAR(20)</td><td>DEFAULT 'active'</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Table 3: users -->
+        <div class="table-card glass-card glass-card-hover rounded-2xl p-6 space-y-4 transition-all">
+          <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="h-3 w-3 rounded-full bg-cyan-500"></span>
+              <h3 class="font-bold text-white font-mono text-base">users</h3>
+            </div>
+            <span class="text-xs font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">Identity Model</span>
+          </div>
+          <p class="text-xs text-gray-400">Stores user accounts. `tenant_id` is NULL for platform SuperAdmin users, or FK for organization members.</p>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs font-mono">
+              <thead class="text-gray-400 border-b border-gray-800">
+                <tr><th class="py-1">Column</th><th class="py-1">Type</th><th class="py-1">Constraint</th></tr>
+              </thead>
+              <tbody class="divide-y divide-gray-800/60 text-gray-300">
+                <tr><td class="py-1 text-brand-300 font-semibold">id</td><td>VARCHAR</td><td>PK (UUID)</td></tr>
+                <tr><td class="py-1 text-cyan-400">tenant_id</td><td>VARCHAR</td><td>FK (tenants.id), NULLABLE (SuperAdmin)</td></tr>
+                <tr><td class="py-1 text-emerald-400">email</td><td>VARCHAR(120)</td><td>UNIQUE, INDEX</td></tr>
+                <tr><td class="py-1">full_name</td><td>VARCHAR(100)</td><td>NOT NULL</td></tr>
+                <tr><td class="py-1">password_hash</td><td>VARCHAR(255)</td><td>NULLABLE</td></tr>
+                <tr><td class="py-1 text-purple-400">role</td><td>VARCHAR(50)</td><td>SUPER_ADMIN, org_admin, member</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Table 4: roles -->
+        <div class="table-card glass-card glass-card-hover rounded-2xl p-6 space-y-4 transition-all">
+          <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="h-3 w-3 rounded-full bg-purple-500"></span>
+              <h3 class="font-bold text-white font-mono text-base">roles</h3>
+            </div>
+            <span class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">Dynamic RBAC</span>
+          </div>
+          <p class="text-xs text-gray-400">Database-driven roles with granular permission arrays. `department_id` is NULL for tenant-wide roles.</p>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs font-mono">
+              <thead class="text-gray-400 border-b border-gray-800">
+                <tr><th class="py-1">Column</th><th class="py-1">Type</th><th class="py-1">Constraint</th></tr>
+              </thead>
+              <tbody class="divide-y divide-gray-800/60 text-gray-300">
+                <tr><td class="py-1 text-brand-300 font-semibold">id</td><td>VARCHAR</td><td>PK (UUID)</td></tr>
+                <tr><td class="py-1 text-cyan-400">tenant_id</td><td>VARCHAR</td><td>FK (tenants.id), INDEX</td></tr>
+                <tr><td class="py-1 text-emerald-400">department_id</td><td>VARCHAR</td><td>FK (departments.id), NULLABLE (Tenant-wide)</td></tr>
+                <tr><td class="py-1 font-semibold">name</td><td>VARCHAR(100)</td><td>e.g. ORG_ADMIN, HR_RECRUITER, TECH_DEV</td></tr>
+                <tr><td class="py-1 text-purple-400 font-semibold">permissions</td><td>JSON</td><td>Array of permission keys e.g. ["documents.read"]</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Table 5: documents -->
+        <div class="table-card glass-card glass-card-hover rounded-2xl p-6 space-y-4 transition-all">
+          <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="h-3 w-3 rounded-full bg-amber-500"></span>
+              <h3 class="font-bold text-white font-mono text-base">documents</h3>
+            </div>
+            <span class="text-xs font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">Knowledge Assets</span>
+          </div>
+          <p class="text-xs text-gray-400">Physical document registry with visibility tags (`public`, `department`, `role_restricted`).</p>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs font-mono">
+              <thead class="text-gray-400 border-b border-gray-800">
+                <tr><th class="py-1">Column</th><th class="py-1">Type</th><th class="py-1">Constraint</th></tr>
+              </thead>
+              <tbody class="divide-y divide-gray-800/60 text-gray-300">
+                <tr><td class="py-1 text-brand-300 font-semibold">id</td><td>VARCHAR</td><td>PK (UUID)</td></tr>
+                <tr><td class="py-1 text-cyan-400">tenant_id</td><td>VARCHAR</td><td>FK (tenants.id), INDEX</td></tr>
+                <tr><td class="py-1">filename</td><td>VARCHAR(255)</td><td>NOT NULL</td></tr>
+                <tr><td class="py-1 text-amber-400 font-semibold">visibility</td><td>VARCHAR(30)</td><td>INDEX (public, department, role_restricted)</td></tr>
+                <tr><td class="py-1">file_path</td><td>VARCHAR(512)</td><td>NULLABLE</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Table 6: document_chunks -->
+        <div class="table-card glass-card glass-card-hover rounded-2xl p-6 space-y-4 transition-all">
+          <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="h-3 w-3 rounded-full bg-rose-500"></span>
+              <h3 class="font-bold text-white font-mono text-base">document_chunks</h3>
+            </div>
+            <span class="text-xs font-mono text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">pgvector Storage</span>
+          </div>
+          <p class="text-xs text-gray-400">Vector embedding storage (1536d) with security metadata for similarity retrieval.</p>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs font-mono">
+              <thead class="text-gray-400 border-b border-gray-800">
+                <tr><th class="py-1">Column</th><th class="py-1">Type</th><th class="py-1">Constraint</th></tr>
+              </thead>
+              <tbody class="divide-y divide-gray-800/60 text-gray-300">
+                <tr><td class="py-1 text-brand-300 font-semibold">id</td><td>VARCHAR</td><td>PK (UUID)</td></tr>
+                <tr><td class="py-1 text-cyan-400">document_id</td><td>VARCHAR</td><td>FK (documents.id), INDEX</td></tr>
+                <tr><td class="py-1 text-cyan-400">tenant_id</td><td>VARCHAR</td><td>INDEX (Hard RLS boundary)</td></tr>
+                <tr><td class="py-1 text-emerald-400">domain_id</td><td>VARCHAR</td><td>INDEX (Department slug/ID)</td></tr>
+                <tr><td class="py-1 text-purple-400 font-semibold">embedding</td><td>VECTOR(1536)</td><td>Cosine similarity index</td></tr>
+                <tr><td class="py-1 text-rose-400 font-semibold">allowed_roles</td><td>JSON</td><td>Array of allowed role names/IDs</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Initialize Mermaid diagram rendering
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      securityLevel: 'loose',
+      themeVariables: {
+        darkMode: true,
+        background: '#030712',
+        primaryColor: '#4f46e5',
+        secondaryColor: '#10b981',
+        tertiaryColor: '#06b6d4',
+      }
+    });
+
+    // Client-side search filter function
+    function filterTables() {
+      const query = document.getElementById('tableSearch').value.toLowerCase();
+      const cards = document.getElementsByClassName('table-card');
+
+      for (let card of cards) {
+        const text = card.innerText.toLowerCase();
+        if (text.includes(query)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      }
+    }
+  </script>
+</body>
+</html>

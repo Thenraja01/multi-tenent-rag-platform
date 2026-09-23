@@ -1,0 +1,16 @@
+GLOBEX ENGINEERING: PRODUCTION DEPLOYMENT RUNBOOK (v3.2)
+============================================================
+
+1. Environment Prerequisites:
+   - Docker network 'nexus-network' must be active.
+   - Database connection string: postgresql+asyncpg://postgres:postgres@localhost:5432/nexus_db
+   - Ollama base URL: http://localhost:11434
+   - Active model name: llama3.2
+
+2. Healthcheck Endpoints:
+   - API Health: http://localhost:8000/health
+   - Ollama Tags: http://localhost:11434/api/tags
+
+3. Emergency Rollback Protocol:
+   - In case of critical service failure, contact the Engineering On-Call Lead at: oncall-eng@globex.com
+   - Primary Incident Commander: Alex Mercer (ext: 4092)
